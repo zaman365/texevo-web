@@ -13,6 +13,10 @@
     "DEPLOY_TARGET": "cloudflare",
     "NEWSLETTER_ENABLED": "false",
     "TRUST_PROXY": "true",
+    "S3_ENDPOINT": "https://t3.storage.dev",
+    "S3_REGION": "auto",
+    "S3_FORCE_PATH_STYLE": "false",
+    "S3_BUCKET": "texevo-private-uploads",
   },
   "observability": { "enabled": true },
 }

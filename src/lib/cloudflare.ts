@@ -1,18 +1,7 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare'
 
-type PrivateBucket = {
-  put(
-    key: string,
-    body: Uint8Array,
-    options: { httpMetadata: { contentType: string } },
-  ): Promise<unknown>
-  get(key: string): Promise<{ arrayBuffer(): Promise<ArrayBuffer> } | null>
-  delete(key: string): Promise<void>
-}
-
 type Bindings = {
   HYPERDRIVE?: { connectionString: string }
-  PRIVATE_UPLOADS?: PrivateBucket
 }
 
 export function cloudflareBindings(): Bindings | null {
