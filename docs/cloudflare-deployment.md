@@ -4,9 +4,9 @@ Deploy `main` to the `texevo-web` Worker in the TEXEVO Cloudflare account config
 
 ## Provisioning status
 
-As of 6 October 2026, hosting has **not** been deployed yet. The private Tigris bucket `texevo-private-uploads` has been created in Frankfurt (`fra`), using Standard storage and no payment method. Its bucket-scoped application key is created and verified; adding its secrets to the hosted Worker and the Neon sign-in are still pending. The `texevo.de` zone is active in Cloudflare; its existing origin records have not been changed.
+As of 6 October 2026, hosting has **not** been deployed yet. The private Tigris bucket `texevo-private-uploads` has been created in Frankfurt (`fra`), using Standard storage and no payment method. Its bucket-scoped application key is created and verified. Neon project `texevo-cloudflare-preview` (`misty-mud-45602859`) is on the free plan in AWS Frankfurt with PostgreSQL 17. Its `production` branch (`br-misty-art-b28tiswb`) contains the isolated `texevo` preview database. Application and CMS migrations succeeded, with 63 editorial drafts, one administrator and zero enquiries verified after seeding. The branch name does not change the application's preview mode.
 
-Before deployment, create a separate preview PostgreSQL database (Neon, AWS Frankfurt, PostgreSQL 17) and a Hyperdrive configuration for that database. Do not reuse local development credentials or an unrelated Cloudflare account. R2 is not used; its subscription was not activated.
+Hyperdrive connection `texevo-preview-db` is prepared but not submitted. Approval to store its database credentials in Cloudflare and create an expiring deployment token is pending; no Worker has been created. The `texevo.de` zone is active in Cloudflare and its existing origin records have not been changed. R2 is not used; its subscription was not activated. Do not reuse local development credentials or an unrelated Cloudflare account.
 
 Add real resource bindings to `wrangler.jsonc` after provisioning:
 
@@ -39,7 +39,9 @@ Seeding creates 63 unpublished editorial drafts and the initial administrator. R
 
 ## Build and publish
 
-Use Node 22 and the pinned pnpm version. Configure Cloudflare Workers Builds for repository `zaman365/texevo-web`, production branch `main`, root `/`:
+Use Node 22 and the pinned pnpm version. The initial release will use a clean local build from `main` and a separately approved, expiring API token for the configured TEXEVO account. The prepared token is named `texevo-initial-deploy`, has only account-level `Workers:Admin`, and expires on 7 October 2026. Cloudflare requires product-level Admin to create a Worker; a per-Worker token can be used after it exists. Do not use the unrelated account in the existing global Wrangler login. Keep the token out of the build environment and supply it only to the deployment process.
+
+Git-connected builds are not configured. If enabled later, configure Cloudflare Workers Builds for repository `zaman365/texevo-web`, production branch `main`, root `/`, and approve the build credential's permissions separately:
 
 | Setting             | Value                                                                                                   |
 | ------------------- | ------------------------------------------------------------------------------------------------------- |
