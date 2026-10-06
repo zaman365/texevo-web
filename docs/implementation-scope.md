@@ -6,11 +6,11 @@ The website follows the public-launch architecture: Next.js App Router, TypeScri
 
 ## Delivered preview
 
-Navigation, public templates, 63 draft content records, six product selection profiles, grouped content/search, source-aware guest brief, sample/reorder branches, a size worksheet with CSV export, printable artwork/sample checklists, optional upload quarantine, CMS roles, protected preview, search projection, staff queue, retries and newsletter consent plumbing are implemented.
+Navigation, public templates, 64 draft content records, six product selection profiles, grouped content/search, source-aware guest brief, sample/reorder branches, a size worksheet with CSV export, printable artwork/sample checklists, optional upload quarantine, CMS roles, protected preview, search projection, staff queue, retries and newsletter consent plumbing are implemented.
 
-The homepage uses a clearly attributed illustration. Product profiles contain explicit unknowns, not invented SKU data. All source material is marked pending review. There are no customer testimonials, owned-factory claims, universal minimums, lead-time promises, prices or blanket certifications. A journal article based on unverified personal ZEHN experience was replaced with an editorial process note; the real founder story should be added only after approval.
+The homepage uses a clearly labelled original AI textile illustration and an example product brief. The production journey and buyer FAQ are usable without JavaScript. See [studio experience notes](studio-experience.md) for the reference-site adaptation and image prompt. Product profiles contain explicit unknowns, not invented SKU data. All source material is marked pending review. There are no customer testimonials, owned-factory claims, universal minimums, lead-time promises, prices or blanket certifications. A journal article based on unverified personal ZEHN experience was replaced with an editorial process note; the real founder story should be added only after approval.
 
-German is primary. Customer and service overviews, all six audience pages, all seven service pages, private-label, contact and legal/privacy preview paths are available in English. Links to untranslated German resources are identified in the English footer. Reciprocal hreflang is limited to genuinely translated content.
+German is primary. Complete German/English homepages and process pages complement customer and service overviews; all six audience pages, all seven service pages, private-label, contact and legal/privacy preview paths are available in English. Links to untranslated German resources are identified in the English footer. Reciprocal hreflang is limited to genuinely translated content.
 
 ## Business focus and navigation
 

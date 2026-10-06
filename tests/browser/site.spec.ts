@@ -17,8 +17,10 @@ test('home, keyboard navigation and responsive layout', async ({ page }) => {
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true)
-    if (width === 1440 || width === 390)
+    if (width === 1440 || width === 390) {
       await page.screenshot({ path: `test-results/home-${width}.png`, fullPage: true })
+      if (width === 1440) await page.screenshot({ path: 'test-results/studio-home-desktop.png' })
+    }
   }
   await page.getByRole('button', { name: 'Menü', exact: true }).click()
   await expect(page.getByRole('navigation', { name: 'Mobile Navigation' })).toBeVisible()
@@ -92,9 +94,67 @@ test('English customer pages lead to the matching English enquiry', async ({ pag
   await expect(page.getByLabel('Service of interest (optional)')).toHaveValue('supply')
 })
 
+test('production steps and buyer questions work with a keyboard and preserve service context', async ({
+  page,
+}) => {
+  await page.goto('/de')
+  const stages = page.locator('.journey-stage')
+  await expect(stages).toHaveCount(7)
+  await stages.nth(3).locator('summary').focus()
+  await page.keyboard.press('Enter')
+  await expect(stages.nth(3)).toHaveAttribute('open', '')
+  await expect(page.locator('.journey-stage[open]')).toHaveCount(1)
+  await expect(
+    stages.nth(3).getByText('Musterreferenz, dokumentierte Kommentare und Freigabeumfang.'),
+  ).toBeVisible()
+  await stages.nth(3).getByRole('link', { name: 'Diesen Schritt besprechen' }).click()
+  await expect(page.getByLabel('Gewünschte Leistung (optional)')).toHaveValue('development')
+  await page.goto('/de#fragen')
+  const faq = page.locator('.faq-item').filter({ hasText: 'Welche Mindestmengen sind möglich?' })
+  await faq.locator('summary').click()
+  await expect(faq.locator('p')).toContainText(
+    'Eine pauschale Mindestmenge gilt nicht für alle Projekte.',
+  )
+  await page.goto('/en')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Your brand.')
+  await expect(page.locator('link[hreflang="de"]')).toHaveAttribute(
+    'href',
+    'http://localhost:3000/de',
+  )
+  await page
+    .getByRole('navigation', { name: 'Main navigation', exact: true })
+    .getByRole('link', { name: 'Process', exact: true })
+    .click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'A shared reference. At every stage.',
+  )
+})
+
+test('process and FAQ stay usable without JavaScript and with reduced motion', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, reducedMotion: 'reduce' })
+  const page = await context.newPage()
+  await page.goto('http://localhost:3000/en')
+  await expect(page.locator('.hero-visual img')).toBeVisible()
+  const quality = page.locator('.journey-stage').filter({ hasText: 'Quality & documentation' })
+  await quality.locator('summary').click()
+  await expect(quality.locator('.stage-content')).toBeVisible()
+  const question = page
+    .locator('.faq-item')
+    .filter({ hasText: 'Do we buy garments or commission a service?' })
+  await question.locator('summary').click()
+  await expect(question.locator('p')).toContainText('Both routes are possible.')
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe(
+    'auto',
+  )
+  await context.close()
+})
+
 test('all content routes and internal navigation targets resolve', async ({ request }) => {
   const paths = [
     '/de',
+    '/en',
     '/de/wissen',
     '/de/materialien',
     '/de/journal',
@@ -269,6 +329,8 @@ test('representative pages have no serious accessibility violations', async ({ p
     '/de/wissen/100-poloshirts',
     '/de/downloads/groessenliste',
     '/en/contact',
+    '/en',
+    '/en/process',
     '/de/kunden',
     '/de/leistungen',
     '/de/kunden/importeure-grosshandel',

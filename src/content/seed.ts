@@ -1,5 +1,6 @@
 import type { ContentRecord, ContentSection } from './types'
 import { businessPages } from './business-pages'
+import { productionStages } from './journey'
 
 const section = (heading: string, text: string, items?: string[]): ContentSection => ({
   heading,
@@ -14,6 +15,21 @@ const entry = (record: ContentRecord): ContentRecord => ({
 
 export const seedContent: ContentRecord[] = [
   ...businessPages,
+  entry({
+    locale: 'en',
+    kind: 'page',
+    slug: 'process',
+    eyebrow: 'Working with TEXEVO',
+    title: 'A shared reference. At every stage.',
+    description:
+      'Explore the steps from your initial brief to repeat supply. Deliverables, decisions and responsibilities are agreed for each project.',
+    translation: '/de/so-arbeiten-wir',
+    ctaLabel: 'Discuss your project',
+    ctaHref: '/en/contact?category=production&service=supply',
+    sections: productionStages.map((stage, i) =>
+      section(`${i + 1}. ${stage.en.title}`, stage.en.text, [stage.en.output, stage.en.decision]),
+    ),
+  }),
   entry({
     locale: 'de',
     kind: 'offer',
@@ -126,29 +142,17 @@ export const seedContent: ContentRecord[] = [
     locale: 'de',
     kind: 'page',
     slug: 'so-arbeiten-wir',
-    eyebrow: 'Von der Frage zur Freigabe',
-    title: 'Gute Textilien beginnen mit guten Entscheidungen.',
+    eyebrow: 'Zusammenarbeit mit TEXEVO',
+    title: 'Eine gemeinsame Referenz. In jeder Phase.',
     description:
-      'Material, Passform und Veredelung gehören zusammen. Ein dokumentierter Ablauf macht offene Punkte und Verantwortlichkeiten sichtbar.',
+      'Vom ersten Briefing bis zum Folgeauftrag: Lernen Sie die Schritte, Ergebnisse und Entscheidungen kennen. Den konkreten Umfang vereinbaren wir für Ihr Projekt.',
+    translation: '/en/process',
+    ctaLabel: 'Projekt besprechen',
+    ctaHref: '/de/anfrage?category=production&service=supply',
     related: ['muster', 'nachweise', 'wissen/musterfreigabe'],
-    sections: [
-      section(
-        '01 — Bedarf verstehen',
-        'Einsatz, Menge, Termin und Rahmenbedingungen ergeben das Briefing. Wenn etwas offen ist, wird es als offene Frage festgehalten.',
-      ),
-      section(
-        '02 — Auswahl prüfen',
-        'Modelle, Material und Veredelung werden auf den Einsatz abgestimmt. Ein physisches Muster hilft, Passform, Griff und Ausführung zu beurteilen.',
-      ),
-      section(
-        '03 — Freigabe dokumentieren',
-        'Artikel, Maße, Farbe, Artwork, Position, Musterstand und erlaubte Abweichungen werden eindeutig festgehalten. Änderungen nach der Freigabe benötigen eine neue Abstimmung.',
-      ),
-      section(
-        '04 — Lieferung und Referenz',
-        'Lieferumfang und Abweichungen werden dokumentiert. Eine spätere Nachbestellung beginnt mit dieser Referenz und einer neuen Prüfung der Konditionen.',
-      ),
-    ],
+    sections: productionStages.map((stage, i) =>
+      section(`${i + 1}. ${stage.de.title}`, stage.de.text, [stage.de.output, stage.de.decision]),
+    ),
   }),
   entry({
     locale: 'de',

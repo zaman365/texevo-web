@@ -6,7 +6,7 @@ export function Footer({ locale }: { locale: 'de' | 'en' }) {
     <footer className="site-footer">
       <div className="footer-top">
         <div>
-          <Link className="wordmark" href={en ? '/en/services' : '/de'}>
+          <Link className="wordmark" href={en ? '/en' : '/de'}>
             TEXEVO
           </Link>
           <p>

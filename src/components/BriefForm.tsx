@@ -284,7 +284,7 @@ export function BriefForm(props: Props) {
             'Please keep this reference for follow-up.',
           )}
         </p>
-        <Link className="button secondary" href={en ? '/en/services' : '/de'}>
+        <Link className="button secondary" href={en ? '/en' : '/de'}>
           {t('Zur Startseite', 'Back to overview')}
         </Link>
       </div>

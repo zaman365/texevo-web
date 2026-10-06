@@ -9,6 +9,7 @@ import { contactEmail, contactPhone, isPreview, siteURL } from '@/lib/env'
 import { contentPath, type ContentRecord } from '@/content/types'
 import { Home } from '@/components/Home'
 import { AudienceGrid, ServiceGrid } from '@/components/BusinessOverview'
+import { BuyerFAQ } from '@/components/ProductionJourney'
 import { ContentCard } from '@/components/ContentCard'
 import { BriefForm } from '@/components/BriefForm'
 import { UtilityPage } from '@/components/UtilityPage'
@@ -67,20 +68,27 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const path = slug?.join('/') || ''
   const query = await searchParams
   const record = (await getContent()).find((r) => r.locale === locale && r.slug === path)
-  const title = record?.title || titles[path] || 'Textilien für Unternehmen'
+  const title =
+    record?.title ||
+    titles[path] ||
+    (locale === 'en' ? 'Apparel for brands & trade' : 'Bekleidung für Marken & Handel')
   const canonical = `/${locale}${path ? `/${path}` : ''}`
   const noindex =
     isPreview ||
     !!query.preview ||
     ['suche', 'eingang', 'receipt', 'newsletter/bestaetigen', 'newsletter/abmelden'].includes(path)
+  const description =
+    record?.description ||
+    intro[path] ||
+    (locale === 'en'
+      ? 'Private-label collections, custom production and repeat garment supply. Development, sourcing and production support for brands and the apparel trade.'
+      : 'B2B-Bekleidung für Marken und Handel. Private Label, Entwicklung, Sourcing und Produktionsbegleitung.')
   return {
     title,
-    description:
-      record?.description ||
-      intro[path] ||
-      'B2B-Bekleidung für Marken und Handel. Private Label, Entwicklung, Sourcing und Produktionsbegleitung.',
+    description,
     alternates: {
       canonical,
+      ...(!path ? { languages: { de: '/de', en: '/en' } } : {}),
       ...(record?.translation
         ? {
             languages: { [locale]: canonical, [locale === 'de' ? 'en' : 'de']: record.translation },
@@ -90,7 +98,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     robots: { index: !noindex, follow: !noindex },
     openGraph: {
       title,
-      description: record?.description || intro[path],
+      description,
       url: canonical,
       locale: locale === 'de' ? 'de_DE' : 'en_GB',
       type: 'website',
@@ -107,7 +115,7 @@ export default async function Page({ params, searchParams }: Props) {
   const path = slug?.join('/') || ''
   const records = await getContent()
   const local = records.filter((r) => r.locale === locale)
-  if (!path && !en) return <Home content={local} />
+  if (!path) return <Home content={records} locale={locale} />
   let record = local.find((r) => r.slug === path)
   if (typeof query.preview === 'string') {
     const draft = await getEditorPreview(query.preview, await headers())
@@ -116,6 +124,7 @@ export default async function Page({ params, searchParams }: Props) {
   }
   if (en && !record && !['contact', 'legal', 'privacy', 'receipt'].includes(path)) notFound()
   if (!record && !titles[path]) notFound()
+  const processPage = !!record && ['so-arbeiten-wir', 'process'].includes(path)
   const overview =
     record &&
     (['kunden', 'customers'].includes(path)
@@ -134,7 +143,7 @@ export default async function Page({ params, searchParams }: Props) {
     <>
       <section className="page-hero shell">
         <nav className="breadcrumb" aria-label={en ? 'Breadcrumb' : 'Brotkrumennavigation'}>
-          <Link href={en ? '/en/services' : '/de'}>{en ? 'Overview' : 'Start'}</Link>
+          <Link href={en ? '/en' : '/de'}>{en ? 'Overview' : 'Start'}</Link>
           <span aria-hidden="true">/</span>
           <span>
             {record?.eyebrow || (form ? (en ? 'Project brief' : 'Projektbriefing') : 'TEXEVO')}
@@ -367,6 +376,7 @@ export default async function Page({ params, searchParams }: Props) {
           ) : null}
         </>
       )}
+      {processPage && <BuyerFAQ locale={locale} />}
       {listKind && (
         <section className="shell" style={{ paddingBottom: 80 }}>
           <nav className="filter-links" aria-label="Wissensbereiche">

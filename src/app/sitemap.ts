@@ -7,6 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (isPreview) return []
   return [
     '/de',
+    '/en',
     '/de/anfrage',
     '/de/wissen',
     '/de/journal',

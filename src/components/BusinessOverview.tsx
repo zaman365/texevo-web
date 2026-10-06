@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { TextileIcon } from './TextileIcon'
 import { audiences, services, businessHref, type BusinessLocale } from '@/content/business'
 
 export function AudienceGrid({ locale = 'de' }: { locale?: BusinessLocale }) {
@@ -25,6 +26,23 @@ export function AudienceGrid({ locale = 'de' }: { locale?: BusinessLocale }) {
                   href={businessHref(audience, locale)}
                   key={audience.id}
                 >
+                  <span className="audience-label">
+                    {audience.core
+                      ? en
+                        ? 'Our focus'
+                        : 'Unser Schwerpunkt'
+                      : audience.id === 'retail'
+                        ? en
+                          ? 'Selected programmes'
+                          : 'Ausgewählte Programme'
+                        : audience.id === 'online'
+                          ? en
+                            ? 'Growing brands'
+                            : 'Wachsende Marken'
+                          : en
+                            ? 'Apparel for your people'
+                            : 'Bekleidung, die verbindet'}
+                  </span>
                   <div className="audience-card-title">
                     <h3>{audience[locale].label}</h3>
                     <span aria-hidden="true">↗</span>
@@ -50,7 +68,9 @@ export function ServiceGrid({ locale = 'de' }: { locale?: BusinessLocale }) {
     <div className="service-overview">
       <Link href={businessHref(supply, locale)} className="supply-card">
         <div>
-          <p className="eyebrow">01 / {en ? 'Our core business' : 'Unser Hauptgeschäft'}</p>
+          <p className="eyebrow">
+            <TextileIcon kind="supply" /> 01 / {en ? 'Our core business' : 'Unser Hauptgeschäft'}
+          </p>
           <h3>{supply[locale].label}</h3>
           <p>{supply[locale].description}</p>
         </div>
@@ -71,7 +91,10 @@ export function ServiceGrid({ locale = 'de' }: { locale?: BusinessLocale }) {
         {services.slice(1).map((service, i) => (
           <Link className="service-card" href={businessHref(service, locale)} key={service.id}>
             <span className="service-number">
-              0{i + 2} <span aria-hidden="true">↗</span>
+              <TextileIcon kind={service.id} />
+              <span>
+                0{i + 2} <span aria-hidden="true">↗</span>
+              </span>
             </span>
             <h3>{service[locale].label}</h3>
             <p>{service[locale].description}</p>

@@ -2,193 +2,419 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ContentCard } from './ContentCard'
 import { AudienceGrid, ServiceGrid } from './BusinessOverview'
+import { ProductionJourney, BuyerFAQ } from './ProductionJourney'
+import { TextileIcon } from './TextileIcon'
+import { productionStages } from '@/content/journey'
+import { enquiryHref, type BusinessLocale } from '@/content/business'
 import type { ContentRecord } from '@/content/types'
 import { isPreview } from '@/lib/env'
-export function Home({ content }: { content: ContentRecord[] }) {
+
+export function Home({
+  content,
+  locale = 'de',
+}: {
+  content: ContentRecord[]
+  locale?: BusinessLocale
+}) {
+  const en = locale === 'en'
+  const t = (de: string, english: string) => (en ? english : de)
   return (
-    <>
-      <section className="home-hero shell">
-        <div className="hero-copy">
-          <p className="eyebrow">
-            <span className="short-rule" />
-            B2B-Bekleidung für Marken & Handel.
-          </p>
-          <h1>
-            Ihre Marke.
-            <br />
-            Ihr Sortiment.
-            <br />
-            <em>Unser Fokus.</em>
-          </h1>
-          <p className="hero-description">
-            Private-Label-Kollektionen, individuelle Produktion und fertige Bekleidung für Ihr
-            Geschäft. Von der ersten Entwicklung bis zur wiederkehrenden Belieferung.
-          </p>
-          <div className="hero-actions">
-            <Link className="button" href="/de/anfrage?category=production&service=supply">
-              Bekleidung anfragen <span aria-hidden="true">↗</span>
-            </Link>
-            <span>Für etablierte Modemarken, Importeure und Großhandel.</span>
-          </div>
-          <Link className="text-link" href="/de/leistungen">
-            Alle Leistungen im Überblick
-          </Link>
-        </div>
-        <figure className="hero-visual">
-          <Image
-            src="/images/fabric-study.jpg"
-            alt="Gefaltete Stoffe in mehreren Farben als textile Materialstudie"
-            width={1000}
-            height={1250}
-            priority
-            sizes="(max-width: 767px) 100vw, 48vw"
-          />
-          <div className="photo-label">
-            <span>Material. Farbe. Gefühl.</span>
-            <span>
-              Jede Entscheidung beginnt
+    <div className="studio-home">
+      <section className="studio-hero shell" aria-labelledby="home-title">
+        <div className="studio-hero-top">
+          <div>
+            <p className="eyebrow">
+              <span className="status-dot" />{' '}
+              {t('TEXEVO / Bekleidung für Marken & Handel', 'TEXEVO / Apparel for brands & trade')}
+            </p>
+            <h1 id="home-title">
+              {t('Ihre Marke.', 'Your brand.')}
               <br />
-              mit genauem Hinsehen.
+              <span>{t('Vom Stoff', 'From fabric')}</span>
+              <br />
+              <em>{t('zur Serie.', 'to collection.')}</em>
+            </h1>
+          </div>
+          <div className="studio-hero-intro">
+            <p>
+              {t(
+                'Gute Bekleidung beginnt mit einer klaren Verbindung.',
+                'Good apparel starts with a clear connection.',
+              )}
+            </p>
+            <p>
+              {t(
+                'Private-Label-Kollektionen, individuelle Produktion und wiederkehrende Belieferung. TEXEVO bringt Produktentwicklung, Beschaffung und Bekleidungslieferung in einen verständlichen Ablauf.',
+                'Private-label collections, custom production and repeat supply. TEXEVO connects product development, sourcing and garment supply through a clearly defined process.',
+              )}
+            </p>
+            <div className="button-row">
+              <Link className="button" href={enquiryHref(locale)}>
+                {t('Bekleidung anfragen', 'Discuss garment supply')}{' '}
+                <span aria-hidden="true">↗</span>
+              </Link>
+              <a className="text-link" href="#leistungen">
+                {t('Leistungen entdecken', 'Explore services')} ↓
+              </a>
+            </div>
+            <span className="hero-footnote">
+              {t(
+                'Für etablierte Marken, Importeure und Großhandel.',
+                'For established brands, importers and wholesalers.',
+              )}
             </span>
           </div>
-          <figcaption>
-            Materialstudie · Foto: Moonstarious Project / Unsplash
-            <br />
-            Illustrationsfoto, kein TEXEVO Produkt- oder Liefernachweis.
-          </figcaption>
-        </figure>
-      </section>
-      <section className="process-strip shell" aria-label="Unser Ablauf">
-        {[
-          ['01', 'Entwickeln', 'Spezifikation & Muster'],
-          ['02', 'Produzieren', 'Bekleidung & Ausstattung'],
-          ['03', 'Weiterdenken', 'Lieferung & Folgeaufträge'],
-        ].map(([n, title, detail]) => (
-          <Link href="/de/so-arbeiten-wir" key={n}>
-            <span className="process-number">{n}</span>
-            <div>
-              <h2>{title}</h2>
-              <p>{detail}</p>
+        </div>
+        <div className="collection-board">
+          <div className="board-toolbar">
+            <span>
+              <span className="board-symbol" aria-hidden="true">
+                T/
+              </span>{' '}
+              TEXEVO <span className="toolbar-divider">/</span>{' '}
+              {t('Der Weg zum Produkt', 'The route to your product')}
+            </span>
+            <span className="quiet-badge">{t('Ablaufbeispiel', 'Illustrative workflow')}</span>
+          </div>
+          <div className="board-content">
+            <figure className="hero-visual">
+              <Image
+                src="/images/textile-study.webp"
+                alt={t(
+                  'Illustrative Textilstudie mit sandfarbenem Overshirt, Stoffmustern und Schnittteilen',
+                  'Illustrative textile study with a sand overshirt, fabric swatches and pattern pieces',
+                )}
+                width={1536}
+                height={1024}
+                preload
+                sizes="(max-width: 767px) 100vw, 60vw"
+              />
+              <figcaption>
+                {t(
+                  'KI-generierte Textilstudie · Kein Produkt- oder Liefernachweis.',
+                  'AI-generated textile study · Not product or supply evidence.',
+                )}
+              </figcaption>
+            </figure>
+            <div className="product-notes">
+              <p className="eyebrow">
+                {t(
+                  'Aus einzelnen Entscheidungen wird ein Produkt',
+                  'Small decisions. A considered product.',
+                )}
+              </p>
+              <h2>
+                {t('Ein Briefing.', 'One brief.')}
+                <br />
+                <em>{t('Ein gemeinsamer Faden.', 'A shared direction.')}</em>
+              </h2>
+              <div className="sample-note">
+                <TextileIcon kind="development" />
+                <div>
+                  <strong>{t('Spezifikation', 'Specification')}</strong>
+                  <span>{t('Material, Passform & Ausstattung', 'Materials, fit & finishing')}</span>
+                </div>
+                <span className="note-index">01</span>
+              </div>
+              <div className="sample-note">
+                <TextileIcon kind="quality" />
+                <div>
+                  <strong>{t('Muster & Freigabe', 'Samples & approval')}</strong>
+                  <span>
+                    {t('Prüfen. Kommentieren. Festhalten.', 'Review. Comment. Document.')}
+                  </span>
+                </div>
+                <span className="note-index">02</span>
+              </div>
+              <div className="sample-note">
+                <TextileIcon kind="logistics" />
+                <div>
+                  <strong>{t('Serie & Nachlieferung', 'Production & repeat supply')}</strong>
+                  <span>
+                    {t('Auf einer klaren Referenz aufbauen', 'Build on a clear reference')}
+                  </span>
+                </div>
+                <span className="note-index">03</span>
+              </div>
+              <a href="#prozess" className="text-link">
+                {t('So greifen die Schritte ineinander', 'Explore the connected steps')} ↗
+              </a>
             </div>
-            <span aria-hidden="true">↗</span>
-          </Link>
-        ))}
+          </div>
+          <div
+            className="board-stages"
+            aria-label={t('Produktionsphasen im Überblick', 'Production stages at a glance')}
+          >
+            {productionStages.map((stage, i) => (
+              <span key={stage.id}>
+                <small>{String(i + 1).padStart(2, '0')}</small>
+                {stage[locale].short}
+                {i < 6 && (
+                  <span className="stage-arrow" aria-hidden="true">
+                    →
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
       </section>
+
+      <nav className="section-index shell" aria-label={t('Auf der Startseite', 'On this page')}>
+        <span>{t('TEXEVO entdecken', 'Explore TEXEVO')}</span>
+        <a href="#kundengruppen">{t('Für wen', 'Who we serve')}</a>
+        <a href="#leistungen">{t('Leistungen', 'Services')}</a>
+        <a href="#zusammenarbeit">{t('Zusammenarbeit', 'Working together')}</a>
+        <a href="#prozess">{t('Ablauf', 'Process')}</a>
+        <a href="#fragen">{t('Fragen', 'Questions')}</a>
+      </nav>
+
       <section className="section shell" id="kundengruppen">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Für wen wir arbeiten</p>
+            <p className="eyebrow">
+              {t('Ihr Geschäft gibt die Richtung vor', 'Built around your business')}
+            </p>
             <h2>
-              Ihr Geschäft.
+              {t('Viele Anforderungen.', 'Different needs.')}
               <br />
-              Der passende Textilpartner.
+              <em>{t('Ein klarer Textilfokus.', 'A clear apparel focus.')}</em>
             </h2>
           </div>
-          <Link className="text-link" href="/de/kunden">
-            Alle Kundengruppen →
+          <Link className="text-link" href={`/${locale}/${en ? 'customers' : 'kunden'}`}>
+            {t('Alle Kundengruppen', 'All customer groups')} ↗
           </Link>
         </div>
         <p className="section-lead">
-          Unser Schwerpunkt liegt auf etablierten europäischen Modemarken und dem Textilhandel. Dazu
-          kommen ausgewählte Retail- und Online-Programme sowie Bekleidung für Teams und
-          Communities.
+          {t(
+            'Im Mittelpunkt stehen etablierte europäische Modemarken und der Textilhandel. Dazu kommen ausgewählte Retail- und Online-Programme sowie Bekleidung für Teams und Communities.',
+            'Established European fashion brands and the apparel trade are our focus, alongside selected retail and online programmes, uniforms and community merchandise.',
+          )}
         </p>
-        <AudienceGrid />
+        <AudienceGrid locale={locale} />
       </section>
-      <section className="section shell services-section" id="leistungen">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Was wir für Sie übernehmen</p>
-            <h2>
-              Bekleidung im Mittelpunkt.
-              <br />
-              Service, wo er weiterhilft.
-            </h2>
-          </div>
-          <Link className="text-link" href="/de/leistungen">
-            Alle Leistungen →
-          </Link>
-        </div>
-        <ServiceGrid />
-      </section>
-      <section className="material-feature">
-        <div className="shell material-inner">
-          <div className="material-type">
-            <span className="eyebrow">Die kleine Materialbibliothek</span>
-            <span className="giant-serif">
-              Stoff für
-              <br />
-              <em>gute Fragen.</em>
-            </span>
-            <Link href="/de/materialien" className="button light">
-              Material & Verfahren entdecken
+
+      <section className="services-surface" id="leistungen">
+        <div className="section shell">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">{t('Das Angebot', 'Our offer')}</p>
+              <h2>
+                {t('Bekleidung im Mittelpunkt.', 'Garment supply at the centre.')}
+                <br />
+                <em>{t('Kompetenz in jedem Detail.', 'Care in every detail.')}</em>
+              </h2>
+            </div>
+            <Link className="text-link" href={`/${locale}/${en ? 'services' : 'leistungen'}`}>
+              {t('Alle Leistungen', 'All services')} ↗
             </Link>
           </div>
-          <div className="material-notes">
-            <p className="eyebrow">Nicht nur eine Frage der Farbe.</p>
-            <h2>
-              Wie fühlt es sich an?
-              <br />
-              Wie wird es genutzt?
-              <br />
-              Was muss es aushalten?
-            </h2>
-            <p>
-              Ein Bildschirm zeigt einen Ausschnitt. Unsere Materialeinträge helfen, die richtigen
-              Eigenschaften zu prüfen – und zu erkennen, wann ein echtes Muster nötig ist.
+          <ServiceGrid locale={locale} />
+        </div>
+      </section>
+
+      <section className="section shell collaboration-section" id="zusammenarbeit">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">
+              {t('So passt TEXEVO zu Ihrem Einkauf', 'A working model that fits')}
             </p>
-            <div className="material-links">
-              <Link href="/de/materialien/pique">01 / Piqué</Link>
-              <Link href="/de/materialien/jersey">02 / Jersey</Link>
-              <Link href="/de/materialien/stick">03 / Stick</Link>
-            </div>
+            <h2>
+              {t('Ihre Ware. Ihr Projekt.', 'Your products. Your project.')}
+              <br />
+              <em>{t('Klare Verantwortlichkeiten.', 'Clear responsibilities.')}</em>
+            </h2>
+          </div>
+          <p>
+            {t(
+              'Entscheidend ist, wer was übernimmt. Das legen wir vor dem ersten Auftrag gemeinsam fest.',
+              'The important question is who takes responsibility for what. We agree that before the first assignment.',
+            )}
+          </p>
+        </div>
+        <div className="working-models">
+          <article className="working-model primary-model">
+            <span className="eyebrow">01 / {t('Unser Hauptgeschäft', 'Our core business')}</span>
+            <h3>{t('Sie kaufen Bekleidung.', 'You buy garments.')}</h3>
+            <p>
+              {t(
+                'TEXEVO liefert die vereinbarten Kleidungsstücke. Spezifikation, Mengen, Ausstattung und Lieferbedingungen bilden die Grundlage Ihres Angebots.',
+                'TEXEVO supplies the agreed garments. Specifications, quantities, finishing and delivery terms form the basis of your quotation.',
+              )}
+            </p>
+            <dl>
+              <div>
+                <dt>{t('Abrechnung', 'Pricing')}</dt>
+                <dd>{t('Großhandelspreis je Kleidungsstück', 'Wholesale price per garment')}</dd>
+              </div>
+              <div>
+                <dt>{t('Passend für', 'Suitable for')}</dt>
+                <dd>
+                  {t(
+                    'Kollektionen, Großmengen & Nachlieferprogramme',
+                    'Collections, bulk orders & repeat supply',
+                  )}
+                </dd>
+              </div>
+            </dl>
+            <Link className="text-link" href={enquiryHref(locale)}>
+              {t('Warenbedarf besprechen', 'Discuss garment supply')} ↗
+            </Link>
+          </article>
+          <article className="working-model">
+            <span className="eyebrow">
+              02 / {t('Separates Service-Mandat', 'Separate service mandate')}
+            </span>
+            <h3>{t('Sie erweitern Ihren Einkauf.', 'You extend your buying team.')}</h3>
+            <p>
+              {t(
+                'Sie beauftragen die Fabrik direkt. TEXEVO begleitet einen definierten Teil Ihrer Beschaffung oder Produktion – projektbezogen oder fortlaufend.',
+                'You contract the factory directly. TEXEVO supports a defined part of sourcing or production, for a single project or on an ongoing basis.',
+              )}
+            </p>
+            <dl>
+              <div>
+                <dt>{t('Abrechnung', 'Pricing')}</dt>
+                <dd>
+                  {t(
+                    'Projekt- oder Monatshonorar nach Vereinbarung',
+                    'Agreed project or monthly fee',
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt>{t('Passend für', 'Suitable for')}</dt>
+                <dd>
+                  {t(
+                    'Lieferantenportfolio, Kategorien & Programme',
+                    'Supplier portfolios, categories & programmes',
+                  )}
+                </dd>
+              </div>
+            </dl>
+            <Link className="text-link" href={enquiryHref(locale, 'office')}>
+              {t('Mandat besprechen', 'Discuss a mandate')} ↗
+            </Link>
+          </article>
+        </div>
+      </section>
+
+      <ProductionJourney locale={locale} />
+
+      <section className="clarity-band">
+        <div className="shell">
+          <p className="eyebrow">
+            {t('Was einen guten Ablauf trägt', 'What makes a process work')}
+          </p>
+          <div className="clarity-grid">
+            {[
+              [
+                t('Eine belastbare Referenz.', 'A reliable reference.'),
+                t(
+                  'Spezifikation, Musterstand und Freigaben nachvollziehbar dokumentieren.',
+                  'Keep specifications, sample versions and approvals documented.',
+                ),
+              ],
+              [
+                t('Vereinbarte Meilensteine.', 'Agreed milestones.'),
+                t(
+                  'Entscheidungen, Zuständigkeiten und offene Punkte frühzeitig abstimmen.',
+                  'Agree decisions, responsibilities and open questions early.',
+                ),
+              ],
+              [
+                t('Ein sauberer Anschluss.', 'A considered next order.'),
+                t(
+                  'Folgeaufträge auf vorhandenen Referenzen und neu bestätigten Konditionen aufbauen.',
+                  'Build repeat orders on existing references and newly confirmed terms.',
+                ),
+              ],
+            ].map(([title, text], i) => (
+              <div key={title}>
+                <span>0{i + 1}</span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
-      <section className="section shell">
+
+      <section className="section shell preparation-section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Wissen, das weiterhilft</p>
+            <p className="eyebrow">
+              {t('Gut vorbereitet ins Gespräch', 'Prepare for a useful conversation')}
+            </p>
             <h2>
-              Vor der Anfrage.
+              {t('Weniger offene Fragen.', 'A little preparation.')}
               <br />
-              Schon einen Schritt weiter.
+              <em>{t('Ein besserer Anfang.', 'A better first brief.')}</em>
             </h2>
           </div>
           <Link className="text-link" href="/de/wissen">
-            Alle Einkaufsratgeber
+            {t('Zur Werkmappe', 'Buyer resources in German')} ↗
           </Link>
         </div>
         <div className="article-grid">
-          {content
-            .filter((r) => r.kind === 'knowledge')
-            .slice(0, 3)
-            .map((r) => (
-              <ContentCard key={r.slug} record={r} />
+          {(en
+            ? ['product-development', 'quality-support', 'delivery-coordination']
+            : ['wissen/lagerware-oder-produktion', 'wissen/musterfreigabe', 'wissen/logo-dateien']
+          )
+            .map((slug) => content.find((r) => r.locale === locale && r.slug === slug))
+            .filter((r): r is ContentRecord => !!r)
+            .map((record) => (
+              <ContentCard key={record.slug} record={record} />
             ))}
         </div>
+        <div className="resource-links">
+          <Link href="/de/materialien">
+            {t('Material & Verfahren', 'Materials & techniques (DE)')} ↗
+          </Link>
+          <Link href="/de/downloads">
+            {t('Checklisten & Arbeitsblätter', 'Checklists & worksheets (DE)')} ↗
+          </Link>
+          <Link href="/de/downloads/groessenliste">
+            {t('Interaktive Größenliste', 'Interactive size worksheet (DE)')} ↗
+          </Link>
+        </div>
       </section>
-      <section className="brief-banner shell">
+
+      <BuyerFAQ locale={locale} />
+      <section className="studio-closing shell">
         <div>
-          <p className="eyebrow">Noch nicht alles geklärt?</p>
+          <p className="eyebrow">
+            {t('Der nächste Schritt ist ein Gespräch', 'The next step is a conversation')}
+          </p>
           <h2>
-            Ein guter Anfang
+            {t('Was möchten Sie', 'What would you like')}
             <br />
-            braucht kein fertiges Briefing.
+            <em>{t('auf den Weg bringen?', 'to bring to life?')}</em>
           </h2>
-          <p>Einsatz, grobe Menge und Ihre offenen Fragen reichen für den ersten Schritt.</p>
+          <p>
+            {t(
+              'Produktgruppe, ungefähre Menge und Ihre offenen Fragen reichen für den Anfang.',
+              'A product category, a rough quantity and your open questions are enough to start.',
+            )}
+          </p>
         </div>
         <div>
-          <Link className="button" href="/de/anfrage">
-            Projekt beschreiben <span aria-hidden="true">↗</span>
+          <Link className="button" href={enquiryHref(locale)}>
+            {t('Projekt beschreiben', 'Describe your project')} ↗
           </Link>
           <p>
             {isPreview
-              ? 'Vorschau: Nur mit Testdaten ausprobieren.'
-              : 'Ohne Kundenkonto. Ohne Bestellverpflichtung.'}
+              ? t(
+                  'Vorschau · Bitte nur Testdaten verwenden.',
+                  'Preview · Please use test data only.',
+                )
+              : t(
+                  'Ohne Kundenkonto. Unverbindlich anfragen.',
+                  'No account needed. Enquire without commitment.',
+                )}
           </p>
         </div>
       </section>
-    </>
+    </div>
   )
 }

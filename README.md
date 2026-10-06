@@ -4,7 +4,7 @@ German-first B2B textile website implementing the launch direction in the suppli
 
 ## Included
 
-- Textile-workroom design: ink, sample paper, vermilion, self-hosted Source Serif 4 / Source Sans 3, responsive desktop/mobile layouts.
+- Studio-style German/English homepages: spacious typography, original illustrated product brief, sticky navigation, expandable production journey and buyer FAQs. Self-hosted Source Serif 4 / Source Sans 3 retain the TEXEVO identity.
 - Garment supply leads the homepage. Grouped customer/service menus, six customer segments and seven service offers are available in German and English; teamwear, private label, process, samples, evidence, partner and company routes remain accessible.
 - Six illustrative product profiles, six buying guides, three journal drafts, six material entries, two labelled process demonstrations and three buyer resources.
 - Four-step and short enquiry with customer/service context, sample and reorder requests, server validation, recoverable failures, no-JavaScript submission, durable reference and atomic delivery outbox.
@@ -57,6 +57,8 @@ After a clean production database is provisioned, apply `pnpm db:migrate` and `N
 
 ## Assets and licenses
 
-The hero is a labelled **illustration**, not product or supplier evidence: [Moonstarious Project on Unsplash](https://unsplash.com/photos/a-stack-of-bright-colored-cloths-on-a-white-surface-H7I8mOX3K8s), downloaded from the image URL returned for that photograph. It is used under the [Unsplash License](https://unsplash.com/license). Replace it with approved original photography before launch if required by the creative brief. No generated people, factories, customer references or certification marks are used.
+The current hero/process image is an original AI-generated textile still life in `public/images/textile-study.webp`, clearly labelled on the website. The built-in generation mode, complete prompt and design rationale are recorded in [studio experience notes](docs/studio-experience.md).
+
+The earlier fabric-study image is retained as a labelled **illustration**, not product or supplier evidence: [Moonstarious Project on Unsplash](https://unsplash.com/photos/a-stack-of-bright-colored-cloths-on-a-white-surface-H7I8mOX3K8s), downloaded from the image URL returned for that photograph. It is used under the [Unsplash License](https://unsplash.com/license). Replace it with approved original photography before launch if required by the creative brief. No generated people, factories, customer references or certification marks are used.
 
 Source Serif 4 and Source Sans 3 are bundled through Fontsource under their included OFL licenses. Dependencies retain their individual licenses. TEXEVO name and trademark clearance remain pending.
