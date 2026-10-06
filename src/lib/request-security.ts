@@ -60,7 +60,25 @@ export async function rateLimit(request: Request, scope: string, limit = 12, win
 }
 export function errorResponse(error: unknown) {
   const known = error instanceof RequestError
-  if (!known) console.error('request_failed')
+  if (!known) {
+    // Keep credentials, submitted data, provider messages and stack traces out of logs.
+    // Error names/codes and an upstream status are enough to diagnose hosted failures.
+    const detail = error as {
+      name?: unknown
+      code?: unknown
+      $metadata?: { httpStatusCode?: unknown }
+    } | null
+    const safeCode = (value: unknown) =>
+      typeof value === 'string' && /^[\w.-]{1,80}$/.test(value) ? value : undefined
+    console.error('request_failed', {
+      name: safeCode(detail?.name),
+      code: safeCode(detail?.code),
+      upstreamStatus:
+        typeof detail?.$metadata?.httpStatusCode === 'number'
+          ? detail.$metadata.httpStatusCode
+          : undefined,
+    })
+  }
   return Response.json(
     {
       error: known
