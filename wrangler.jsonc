@@ -7,9 +7,10 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "texevo-web" }],
+  "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "b1f0468206c14d659fb4df9142cca7b4" }],
   "vars": {
     "SITE_MODE": "preview",
-    "SITE_URL": "https://texevo.de",
+    "SITE_URL": "https://texevo-web.zaman-ase365.workers.dev",
     "DEPLOY_TARGET": "cloudflare",
     "NEWSLETTER_ENABLED": "false",
     "TRUST_PROXY": "true",
