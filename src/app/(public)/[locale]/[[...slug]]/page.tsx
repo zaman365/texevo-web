@@ -8,6 +8,7 @@ import { getContent, getEditorPreview, searchContent } from '@/lib/content'
 import { contactEmail, contactPhone, isPreview, siteURL } from '@/lib/env'
 import { contentPath, type ContentRecord } from '@/content/types'
 import { Home } from '@/components/Home'
+import { AudienceGrid, ServiceGrid } from '@/components/BusinessOverview'
 import { ContentCard } from '@/components/ContentCard'
 import { BriefForm } from '@/components/BriefForm'
 import { UtilityPage } from '@/components/UtilityPage'
@@ -77,7 +78,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     description:
       record?.description ||
       intro[path] ||
-      'Teamkleidung, Private Label und Sourcing mit einem klaren nächsten Schritt.',
+      'B2B-Bekleidung für Marken und Handel. Private Label, Entwicklung, Sourcing und Produktionsbegleitung.',
     alternates: {
       canonical,
       ...(record?.translation
@@ -113,12 +114,15 @@ export default async function Page({ params, searchParams }: Props) {
     if (!draft || draft.slug !== path || draft.locale !== locale) notFound()
     record = draft
   }
-  if (
-    en &&
-    !['private-label', 'sourcing-office', 'contact', 'legal', 'privacy', 'receipt'].includes(path)
-  )
-    notFound()
+  if (en && !record && !['contact', 'legal', 'privacy', 'receipt'].includes(path)) notFound()
   if (!record && !titles[path]) notFound()
+  const overview =
+    record &&
+    (['kunden', 'customers'].includes(path)
+      ? 'audiences'
+      : ['leistungen', 'services'].includes(path)
+        ? 'services'
+        : null)
   const form = ['anfrage', 'kontakt', 'contact', 'nachbestellen'].includes(path)
   const listKind = ({ wissen: 'knowledge', journal: 'journal', materialien: 'material' } as const)[
     path as 'wissen' | 'journal' | 'materialien'
@@ -130,7 +134,7 @@ export default async function Page({ params, searchParams }: Props) {
     <>
       <section className="page-hero shell">
         <nav className="breadcrumb" aria-label={en ? 'Breadcrumb' : 'Brotkrumennavigation'}>
-          <Link href={en ? '/en/private-label' : '/de'}>{en ? 'Overview' : 'Start'}</Link>
+          <Link href={en ? '/en/services' : '/de'}>{en ? 'Overview' : 'Start'}</Link>
           <span aria-hidden="true">/</span>
           <span>
             {record?.eyebrow || (form ? (en ? 'Project brief' : 'Projektbriefing') : 'TEXEVO')}
@@ -175,11 +179,11 @@ export default async function Page({ params, searchParams }: Props) {
                 ? 'reorder'
                 : categories.includes(textParam(query.category) as (typeof categories)[number])
                   ? textParam(query.category)
-                  : en
-                    ? 'production'
-                    : 'team'
+                  : 'production'
             }
             product={textParam(query.product)}
+            audience={textParam(query.audience)}
+            service={textParam(query.service)}
             source={textParam(query.utm_source)}
             medium={textParam(query.utm_medium)}
             campaign={textParam(query.utm_campaign)}
@@ -229,7 +233,23 @@ export default async function Page({ params, searchParams }: Props) {
           </aside>
         </div>
       )}
-      {record && (
+      {overview && (
+        <section className="shell business-index">
+          {record?.status === 'illustrative' && (
+            <p className="review-note">
+              {en
+                ? 'Review draft · Business details, scope and delivery capability are pending approval.'
+                : 'Redaktionsentwurf · Unternehmensdaten, Leistungsumfang und Lieferfähigkeit sind noch zu bestätigen.'}
+            </p>
+          )}
+          {overview === 'audiences' ? (
+            <AudienceGrid locale={locale} />
+          ) : (
+            <ServiceGrid locale={locale} />
+          )}
+        </section>
+      )}
+      {record && !overview && (
         <>
           <div className="shell content-layout">
             <article className="prose">
@@ -286,6 +306,14 @@ export default async function Page({ params, searchParams }: Props) {
               )}
             </article>
             <aside className="article-aside">
+              <div className="business-crosslinks">
+                <Link href={`/${locale}/${en ? 'customers' : 'kunden'}`}>
+                  {en ? 'All customer groups' : 'Alle Kundengruppen'} →
+                </Link>
+                <Link href={`/${locale}/${en ? 'services' : 'leistungen'}`}>
+                  {en ? 'All services' : 'Alle Leistungen'} →
+                </Link>
+              </div>
               <p className="eyebrow">{en ? 'On this page' : 'Auf dieser Seite'}</p>
               <nav>
                 {record.sections.map((s, i) => (

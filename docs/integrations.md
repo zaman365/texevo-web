@@ -2,7 +2,7 @@
 
 ## Enquiry boundary
 
-`POST /api/enquiries` accepts JSON or a URL-encoded short form. The shared Zod schema is `src/lib/brief-schema.ts`. Enquiries need a random UUID idempotency key, category, company, contact, email, a brief of at least ten characters and acknowledgement of the enquiry privacy notice. Phone, quantities, deadlines, budget and uploads are optional. Reorders require a reference. Newsletter permission is never inferred.
+`POST /api/enquiries` accepts JSON or a URL-encoded short form. The shared Zod schema is `src/lib/brief-schema.ts`. Enquiries need a random UUID idempotency key, category, company, contact, email, a brief of at least ten characters and acknowledgement of the enquiry privacy notice. Phone, quantities, deadlines, budget and uploads are optional. Optional `audience` and `service` identifiers are restricted to the shared business catalog and stored in the brief, including native form submissions. Reorders require a reference. Newsletter permission is never inferred.
 
 An enquiry and its acknowledgement/CRM outbox rows are inserted in one PostgreSQL transaction. A unique idempotency key binds to a normalized request hash. Identical retries return the same receipt; different content with the same key gets HTTP 409. No public enquiry list, read or update endpoint exists. Receipt pages display only the opaque reference supplied after POST; they never fetch private records.
 

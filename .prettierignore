@@ -7,3 +7,4 @@ src/payload-types.ts
 src/migrations
 test-results
 playwright-report
+next-env.d.ts

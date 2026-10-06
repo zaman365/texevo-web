@@ -5,7 +5,7 @@ This is a review preview. Pending items are not implicit approval to spend, publ
 - [ ] Confirm trading name/domain clearance, legal entity, address, representative and applicable register/tax details.
 - [ ] Provide actual contact channels and response owner; approve public legal/privacy notices for the implemented processing.
 - [ ] Qualify supplier routes and replace illustrative products with six or more verified, source-backed records.
-- [ ] Review German copy, English production/contact routes, founder statements and all image rights; publish approved CMS content.
+- [ ] Review German copy, English customer/service/contact routes, founder statements and all image rights; publish approved CMS content.
 - [ ] Supply original authorised photography where required by the brief; retain accurate captions and evidence scope.
 - [ ] Choose owned hosting/database/private-object accounts, processing regions, DPAs and any international specialist access arrangements.
 - [ ] Configure HTTPS, upstream body/connection limits, trusted proxy handling, staff identity/MFA and least-privilege accounts.

@@ -5,9 +5,9 @@ German-first B2B textile website implementing the launch direction in the suppli
 ## Included
 
 - Textile-workroom design: ink, sample paper, vermilion, self-hosted Source Serif 4 / Source Sans 3, responsive desktop/mobile layouts.
-- Teamwear, private label, sourcing, process, sample, evidence, partner and company routes; complete English production/sourcing/contact path.
+- Garment supply leads the homepage. Grouped customer/service menus, six customer segments and seven service offers are available in German and English; teamwear, private label, process, samples, evidence, partner and company routes remain accessible.
 - Six illustrative product profiles, six buying guides, three journal drafts, six material entries, two labelled process demonstrations and three buyer resources.
-- Four-step and short enquiry, sample and reorder requests, server validation, recoverable failures, no-JavaScript submission, durable reference and atomic delivery outbox.
+- Four-step and short enquiry with customer/service context, sample and reorder requests, server validation, recoverable failures, no-JavaScript submission, durable reference and atomic delivery outbox.
 - Optional private PDF/PNG/JPEG uploads, signature/extension/size checks, three-file limit, scan quarantine and authorized post-scan downloads.
 - Payload CMS with drafts, versions, editorial roles, protected preview, publication guards and PostgreSQL public search projection.
 - Staff enquiry/failure view at `/de/intern`; retry worker, health endpoint, disabled-by-default double-opt-in newsletter and consent ledger.

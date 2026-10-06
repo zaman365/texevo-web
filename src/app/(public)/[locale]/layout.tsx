@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteURL),
   title: { default: 'TEXEVO · Textilien für Unternehmen', template: '%s | TEXEVO' },
   description:
-    'Teamkleidung, Private Label und Sourcing. Material, Muster und Freigaben gemeinsam durchdenken.',
+    'B2B-Bekleidung für Marken und Handel. Private Label, Entwicklung, Veredelung, Sourcing und Produktionsbegleitung.',
   icons: { icon: '/favicon.svg' },
   robots: isPreview ? { index: false, follow: false } : { index: true, follow: true },
 }

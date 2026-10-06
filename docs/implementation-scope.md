@@ -6,11 +6,19 @@ The website follows the public-launch architecture: Next.js App Router, TypeScri
 
 ## Delivered preview
 
-Navigation, public templates, 35 draft content records, six product selection profiles, grouped content/search, source-aware guest brief, sample/reorder branches, a size worksheet with CSV export, printable artwork/sample checklists, optional upload quarantine, CMS roles, protected preview, search projection, staff queue, retries and newsletter consent plumbing are implemented.
+Navigation, public templates, 63 draft content records, six product selection profiles, grouped content/search, source-aware guest brief, sample/reorder branches, a size worksheet with CSV export, printable artwork/sample checklists, optional upload quarantine, CMS roles, protected preview, search projection, staff queue, retries and newsletter consent plumbing are implemented.
 
 The homepage uses a clearly attributed illustration. Product profiles contain explicit unknowns, not invented SKU data. All source material is marked pending review. There are no customer testimonials, owned-factory claims, universal minimums, lead-time promises, prices or blanket certifications. A journal article based on unverified personal ZEHN experience was replaced with an editorial process note; the real founder story should be added only after approval.
 
-German is primary. English private-label, sourcing, contact and legal/privacy preview paths are complete. Links to untranslated German resources are identified in the English footer. Reciprocal hreflang is limited to genuinely translated offers.
+German is primary. Customer and service overviews, all six audience pages, all seven service pages, private-label, contact and legal/privacy preview paths are available in English. Links to untranslated German resources are identified in the English footer. Reciprocal hreflang is limited to genuinely translated content.
+
+## Business focus and navigation
+
+The latest user request takes precedence over the original teamwear-led entry point. Finished-garment supply is the main offer, with established European fashion brands and importers/wholesalers/distributors leading the homepage. Selected retail-chain and online-brand programmes follow, alongside uniforms/corporate wear and merchandise/community apparel. These are intended customer groups, not claims of existing accounts.
+
+The shared catalog in `src/content/business.ts` drives customer/service menus, homepage sections, overview cards, footer links and enquiry selectors in German and English. All seven services have their own route and explain the basis of the quotation: garment price, development fees, finishing charges, monthly sourcing-office fees, project management fees, independent QC/technical fees and optional packing/delivery fees. Related links connect audience pages to relevant services. Existing teamwear and private-label URLs are retained.
+
+The optional `audience` and `service` identifiers travel from a page CTA through enquiry validation, review, storage and webhook payloads. The native form retry page preserves them too. Preview content and newly seeded CMS records remain drafts; existing CMS edits are not overwritten by seeding.
 
 ## Ready to connect, not provisioned
 
@@ -22,7 +30,7 @@ Campaign content can reuse the controlled content template. Finance remains in t
 
 ## Explicitly deferred
 
-Customer login/workspace, formal approvals, automatic reorders, live stock, checkout, budget/delivery calculators, comparison, AI assistance, EDI and automatic customer follow-up remain the strategy's later phases. Hospitality and packaging remain unactivated until supplier/category readiness is established.
+Customer login/workspace, formal approvals, automatic reorders, live stock, checkout, budget/delivery calculators, comparison, AI assistance, EDI and automatic customer follow-up remain the strategy's later phases. Hospitality staff clothing and packing/delivery coordination are now represented as requested preview offers. Broader hospitality textiles, standalone packaging supply and operational activation still require supplier/category readiness.
 
 ## Acceptance limits
 

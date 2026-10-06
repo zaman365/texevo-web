@@ -2,14 +2,15 @@ import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { randomUUID } from 'node:crypto'
 import { seedContent } from '../../src/content/seed'
+import { audiences, services, businessHref } from '../../src/content/business'
 
 test('home, keyboard navigation and responsive layout', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(e.message))
   await page.goto('/de')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Ihr Team.')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Ihre Marke.')
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
-  await expect(page.getByRole('link', { name: /Teamkleidung anfragen/ })).toBeVisible()
+  await expect(page.getByRole('link', { name: /Bekleidung anfragen/ })).toBeVisible()
   await page.locator('.hero-visual img').evaluate((image: HTMLImageElement) => image.decode())
   for (const width of [1440, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 })
@@ -24,6 +25,71 @@ test('home, keyboard navigation and responsive layout', async ({ page }) => {
   await page.keyboard.press('Escape')
   await expect(page.getByRole('button', { name: 'Menü', exact: true })).toBeFocused()
   expect(errors).toEqual([])
+})
+
+test('desktop navigation exposes every audience and service with keyboard access', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.goto('/de')
+  const nav = page.getByRole('navigation', { name: 'Hauptnavigation', exact: true })
+  const audienceMenu = nav.locator('summary').filter({ hasText: 'Für wen' })
+  await audienceMenu.focus()
+  await page.keyboard.press('Enter')
+  for (const audience of audiences)
+    await expect(nav.locator(`a[href="${businessHref(audience, 'de')}"]`)).toBeVisible()
+  await page.screenshot({ path: 'test-results/customer-menu.png' })
+  await page.keyboard.press('Escape')
+  await expect(audienceMenu).toBeFocused()
+  await expect(nav.locator('details[open]')).toHaveCount(0)
+  await nav.locator('summary').filter({ hasText: 'Leistungen' }).click()
+  for (const service of services)
+    await expect(nav.locator(`a[href="${businessHref(service, 'de')}"]`)).toBeVisible()
+  const report = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+    .analyze()
+  expect(
+    report.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
+  ).toEqual([])
+  await page.locator('.utility-bar > span').click()
+  await expect(nav.locator('details[open]')).toHaveCount(0)
+  await expect(page.locator('main .audience-card')).toHaveCount(6)
+  await expect(page.locator('main .service-card')).toHaveCount(6)
+  await expect(page.locator('main .supply-card')).toBeVisible()
+})
+
+test('mobile menus reach supporting services and retain the enquiry context', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/de/teamkleidung')
+  await page.getByRole('button', { name: 'Menü', exact: true }).click()
+  const nav = page.getByRole('navigation', { name: 'Mobile Navigation' })
+  await nav.locator('summary').filter({ hasText: 'Für wen' }).click()
+  for (const audience of audiences)
+    await expect(nav.locator(`a[href="${businessHref(audience, 'de')}"]`)).toBeVisible()
+  await nav.locator('summary').filter({ hasText: 'Leistungen' }).click()
+  await expect(nav.locator('details[open]')).toHaveCount(1)
+  for (const service of services)
+    await expect(nav.locator(`a[href="${businessHref(service, 'de')}"]`)).toBeVisible()
+  await nav.getByRole('link', { name: 'Verpackung & Lieferkoordination' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Verpackung & Lieferkoordination',
+  )
+  await expect(nav).toHaveCount(0)
+  await page.getByRole('link', { name: 'Diese Leistung anfragen', exact: true }).first().click()
+  await expect(page.getByLabel('Gewünschte Leistung (optional)')).toHaveValue('logistics')
+  await expect(page.getByLabel('Andere Textilanfrage')).toBeChecked()
+})
+
+test('English customer pages lead to the matching English enquiry', async ({ page }) => {
+  await page.goto('/en/customers')
+  await page
+    .locator('main')
+    .getByRole('link', { name: /Growing online brands/ })
+    .click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Growing online brands')
+  await page.getByRole('link', { name: 'Discuss your garment programme' }).first().click()
+  await expect(page.getByLabel('Your business type (optional)')).toHaveValue('online')
+  await expect(page.getByLabel('Service of interest (optional)')).toHaveValue('supply')
 })
 
 test('all content routes and internal navigation targets resolve', async ({ request }) => {
@@ -69,7 +135,10 @@ test('guided mobile brief preserves inputs on errors and saves a real test recei
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/de/anfrage')
+  await page.goto('/de/kunden/modemarken')
+  await page.getByRole('link', { name: 'Bekleidungsbedarf besprechen' }).first().click()
+  await expect(page.getByLabel('Ihr Unternehmenstyp (optional)')).toHaveValue('fashion')
+  await expect(page.getByLabel('Gewünschte Leistung (optional)')).toHaveValue('supply')
   await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   await expect(page.locator('.notice[role=alert]')).toBeVisible()
@@ -103,11 +172,19 @@ test('guided mobile brief preserves inputs on errors and saves a real test recei
       .filter({ hasText: 'Wir testen eine Anfrage für 100 Poloshirts mit Logo.' }),
   ).toBeVisible()
   await page.unroute('**/api/enquiries')
+  const savedRequest = page.waitForRequest(
+    (request) => request.url().endsWith('/api/enquiries') && request.method() === 'POST',
+  )
   await page.getByRole('button', { name: 'Testanfrage senden', exact: true }).click()
   await expect(
     page.getByRole('heading', { name: 'Danke. Ihr Briefing ist angekommen.' }),
   ).toBeVisible()
   await expect(page.locator('.receipt-code')).toHaveText(/TX-\d{4}-[A-F0-9]{8}/)
+  expect((await savedRequest).postDataJSON()).toMatchObject({
+    audience: 'fashion',
+    service: 'supply',
+    category: 'production',
+  })
 })
 
 test('idempotency, CSRF, private files and quarantine are enforced', async ({ request }) => {
@@ -168,7 +245,11 @@ test('idempotency, CSRF, private files and quarantine are enforced', async ({ re
 test('short enquiry works without JavaScript', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false })
   const page = await context.newPage()
-  await page.goto('http://localhost:3000/de/kontakt')
+  await page.goto(
+    'http://localhost:3000/de/kontakt?category=sourcing&audience=wholesale&service=office',
+  )
+  await expect(page.getByLabel('Ihr Unternehmenstyp (optional)')).toHaveValue('wholesale')
+  await expect(page.getByLabel('Gewünschte Leistung (optional)')).toHaveValue('office')
   await page
     .getByLabel('Ihr Vorhaben und offene Fragen')
     .fill('Test des Formulars ohne JavaScript.')
@@ -188,6 +269,9 @@ test('representative pages have no serious accessibility violations', async ({ p
     '/de/wissen/100-poloshirts',
     '/de/downloads/groessenliste',
     '/en/contact',
+    '/de/kunden',
+    '/de/leistungen',
+    '/de/kunden/importeure-grosshandel',
   ]) {
     await page.goto(path)
     const report = await new AxeBuilder({ page })

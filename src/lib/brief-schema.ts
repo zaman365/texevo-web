@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { audiences, services } from '@/content/business'
 export const categories = [
   'team',
   'production',
@@ -9,10 +10,10 @@ export const categories = [
   'other',
 ] as const
 export const categoryLabels: Record<string, string> = {
-  team: 'Teamkleidung',
-  production: 'Private Label',
+  team: 'Teamkleidung & Merchandise',
+  production: 'Bekleidung & Private Label',
   sourcing: 'Sourcing-Begleitung',
-  sample: 'Muster',
+  sample: 'Entwicklung & Muster',
   reorder: 'Nachbestellung',
   partner: 'Partneranfrage',
   other: 'Andere Textilanfrage',
@@ -24,6 +25,14 @@ export const briefSchema = z
     idempotencyKey: z.uuid(),
     locale: z.enum(['de', 'en']).default('de'),
     category: z.enum(categories),
+    audience: z
+      .enum(['', ...audiences.map((a) => a.id)])
+      .optional()
+      .default(''),
+    service: z
+      .enum(['', ...services.map((s) => s.id)])
+      .optional()
+      .default(''),
     company: z.string().trim().min(2, 'Bitte Unternehmen angeben.').max(160),
     name: z.string().trim().min(2, 'Bitte Kontaktperson angeben.').max(120),
     email: z.email('Bitte gültige E-Mail-Adresse angeben.').max(254),

@@ -10,7 +10,13 @@ export function uploadToken(id: string, key: string) {
     .digest('hex')
 }
 export async function saveEnquiry(brief: Brief) {
-  const { idempotencyKey, website: _honeypot, ...body } = brief
+  const { idempotencyKey, website: _honeypot, audience, service, ...existingFields } = brief
+  // Keep retries from forms opened before the new optional fields hash-compatible.
+  const body = {
+    ...existingFields,
+    ...(audience ? { audience } : {}),
+    ...(service ? { service } : {}),
+  }
   const digest = createHash('sha256').update(JSON.stringify(body)).digest('hex')
   const id = randomUUID()
   const reference = `TX-${new Date().getUTCFullYear()}-${id.slice(0, 8).toUpperCase()}`

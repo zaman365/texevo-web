@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ContentCard } from './ContentCard'
+import { AudienceGrid, ServiceGrid } from './BusinessOverview'
 import type { ContentRecord } from '@/content/types'
 import { isPreview } from '@/lib/env'
 export function Home({ content }: { content: ContentRecord[] }) {
@@ -10,27 +11,27 @@ export function Home({ content }: { content: ContentRecord[] }) {
         <div className="hero-copy">
           <p className="eyebrow">
             <span className="short-rule" />
-            Für Unternehmen. Für Ihr Team.
+            B2B-Bekleidung für Marken & Handel.
           </p>
           <h1>
-            Ihr Team.
+            Ihre Marke.
             <br />
-            Ihr Stoff.
+            Ihr Sortiment.
             <br />
-            <em>Ihr nächster Schritt.</em>
+            <em>Unser Fokus.</em>
           </h1>
           <p className="hero-description">
-            Polos, Shirts und Hoodies passend zu Einsatz, Größen und Veredelung. Gemeinsam
-            ausgewählt. Klar freigegeben.
+            Private-Label-Kollektionen, individuelle Produktion und fertige Bekleidung für Ihr
+            Geschäft. Von der ersten Entwicklung bis zur wiederkehrenden Belieferung.
           </p>
           <div className="hero-actions">
-            <Link className="button" href="/de/anfrage?category=team">
-              Teamkleidung anfragen <span aria-hidden="true">↗</span>
+            <Link className="button" href="/de/anfrage?category=production&service=supply">
+              Bekleidung anfragen <span aria-hidden="true">↗</span>
             </Link>
-            <span>Auch für Anfragen um 100 Stück.</span>
+            <span>Für etablierte Modemarken, Importeure und Großhandel.</span>
           </div>
-          <Link className="text-link" href="/de/private-label">
-            Eine eigene Kollektion? Private Label entdecken
+          <Link className="text-link" href="/de/leistungen">
+            Alle Leistungen im Überblick
           </Link>
         </div>
         <figure className="hero-visual">
@@ -59,9 +60,9 @@ export function Home({ content }: { content: ContentRecord[] }) {
       </section>
       <section className="process-strip shell" aria-label="Unser Ablauf">
         {[
-          ['01', 'Auswählen', 'Material & Passform'],
-          ['02', 'Freigeben', 'Muster & Veredelung'],
-          ['03', 'Dokumentieren', 'Eine klare Referenz'],
+          ['01', 'Entwickeln', 'Spezifikation & Muster'],
+          ['02', 'Produzieren', 'Bekleidung & Ausstattung'],
+          ['03', 'Weiterdenken', 'Lieferung & Folgeaufträge'],
         ].map(([n, title, detail]) => (
           <Link href="/de/so-arbeiten-wir" key={n}>
             <span className="process-number">{n}</span>
@@ -73,25 +74,42 @@ export function Home({ content }: { content: ContentRecord[] }) {
           </Link>
         ))}
       </section>
-      <section className="section shell">
+      <section className="section shell" id="kundengruppen">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Ihr Bedarf bestimmt den Weg</p>
-            <h2>Was haben Sie vor?</h2>
+            <p className="eyebrow">Für wen wir arbeiten</p>
+            <h2>
+              Ihr Geschäft.
+              <br />
+              Der passende Textilpartner.
+            </h2>
           </div>
-          <p>
-            Ein fokussierter Einstieg.
-            <br />
-            Die richtigen Fragen für Ihr Projekt.
-          </p>
+          <Link className="text-link" href="/de/kunden">
+            Alle Kundengruppen →
+          </Link>
         </div>
-        <div className="route-grid">
-          {content
-            .filter((r) => r.locale === 'de' && r.kind === 'offer')
-            .map((r, i) => (
-              <ContentCard key={r.slug} record={r} number={i + 1} />
-            ))}
+        <p className="section-lead">
+          Unser Schwerpunkt liegt auf etablierten europäischen Modemarken und dem Textilhandel. Dazu
+          kommen ausgewählte Retail- und Online-Programme sowie Bekleidung für Teams und
+          Communities.
+        </p>
+        <AudienceGrid />
+      </section>
+      <section className="section shell services-section" id="leistungen">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Was wir für Sie übernehmen</p>
+            <h2>
+              Bekleidung im Mittelpunkt.
+              <br />
+              Service, wo er weiterhilft.
+            </h2>
+          </div>
+          <Link className="text-link" href="/de/leistungen">
+            Alle Leistungen →
+          </Link>
         </div>
+        <ServiceGrid />
       </section>
       <section className="material-feature">
         <div className="shell material-inner">

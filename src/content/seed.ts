@@ -1,4 +1,5 @@
 import type { ContentRecord, ContentSection } from './types'
+import { businessPages } from './business-pages'
 
 const section = (heading: string, text: string, items?: string[]): ContentSection => ({
   heading,
@@ -12,17 +13,23 @@ const entry = (record: ContentRecord): ContentRecord => ({
 })
 
 export const seedContent: ContentRecord[] = [
+  ...businessPages,
   entry({
     locale: 'de',
     kind: 'offer',
     slug: 'teamkleidung',
-    eyebrow: '01 / Für Ihr Team',
+    eyebrow: 'Teams & Corporate Wear',
     title: 'Ein Team. Viele Größen. Ein klarer Plan.',
     description:
       'Polos, Shirts und Hoodies für den Arbeitsalltag, Veranstaltungen und neue Kolleginnen und Kollegen. Auch eine Anfrage um 100 Stück ist ein guter Ausgangspunkt.',
     ctaLabel: 'Teamkleidung anfragen',
-    ctaHref: '/de/anfrage?category=team',
-    related: ['wissen/100-poloshirts', 'wissen/groessen-erfassen', 'materialien/pique'],
+    ctaHref: '/de/anfrage?category=team&audience=uniform&service=supply',
+    related: [
+      'kunden/uniformen-corporate',
+      'kunden/merchandise-community',
+      'veredelung',
+      'wissen/groessen-erfassen',
+    ],
     sections: [
       section(
         'Vom Einsatz zum passenden Textil',
@@ -48,14 +55,14 @@ export const seedContent: ContentRecord[] = [
     locale: 'de',
     kind: 'offer',
     slug: 'private-label',
-    eyebrow: '02 / Für Ihre Marke',
-    title: 'Ihre Idee. Eine belastbare Spezifikation.',
+    eyebrow: 'Bekleidungslieferung / Private Label',
+    title: 'Ihre Kollektion. Von der Idee bis zur Lieferung.',
     description:
-      'Individuelle Bekleidung beginnt mit klaren Anforderungen. Wir strukturieren die Fragen zu Entwicklung, Material, Muster und Produktion.',
+      'Private-Label-Kollektionen und individuelle Bekleidung für Marken und Handel. Entwicklung und Muster bereiten den Warenauftrag vor; wiederkehrende Belieferung wird projektbezogen vereinbart.',
     ctaLabel: 'Produktionsprojekt beschreiben',
-    ctaHref: '/de/anfrage?category=production',
+    ctaHref: '/de/anfrage?category=production&service=supply',
     translation: '/en/private-label',
-    related: ['wissen/lagerware-oder-produktion', 'wissen/musterfreigabe'],
+    related: ['bekleidungslieferung', 'produktentwicklung', 'kunden/modemarken'],
     sections: [
       section(
         'Entwicklung und Produktion getrennt betrachten',
@@ -82,14 +89,19 @@ export const seedContent: ContentRecord[] = [
     locale: 'de',
     kind: 'offer',
     slug: 'sourcing-office',
-    eyebrow: '03 / Für Ihren Einkauf',
+    eyebrow: 'Laufende Sourcing- & Produktionsbegleitung',
     title: 'Ein klarer Auftrag für Ihre Beschaffung.',
     description:
-      'Ein abgegrenztes Dienstleistungsmandat für Entwicklung, Lieferantenabstimmung oder Produktionsbegleitung. Zuständigkeiten werden vor dem Start vereinbart.',
+      'Ein monatliches Mandat für ein definiertes Lieferantenportfolio, eine Warengruppe oder ein Produktionsprogramm. Aufgaben, Berichte und Zuständigkeiten werden vor dem Start vereinbart.',
     ctaLabel: 'Sourcing-Bedarf besprechen',
-    ctaHref: '/de/anfrage?category=sourcing',
+    ctaHref: '/de/anfrage?category=sourcing&service=office',
     translation: '/en/sourcing-office',
+    related: ['produktionsmanagement', 'qualitaetssicherung', 'bekleidungslieferung'],
     sections: [
+      section(
+        'Laufende Betreuung mit Monatsbudget',
+        'Ein monatliches Honorar deckt den vereinbarten Umfang für Lieferantenportfolio, Kategorie oder Produktionsprogramm ab. Aufgaben, Ansprechpartner, Berichtstakt, Laufzeit und Zusatzleistungen werden vor Beginn festgelegt. Ein einzelnes Vorhaben kann stattdessen als Projektmandat vereinbart werden.',
+      ),
       section(
         'Wer kauft bei wem?',
         'Beim Dienstleistungsmandat schließen Sie den Warenvertrag mit dem vereinbarten Lieferanten. TEXEVO erhält ein gesondert vereinbartes Honorar für die beschriebenen Leistungen. Beim Produktkauf von TEXEVO gelten andere Verantwortlichkeiten; beide Modelle werden nicht vermischt.',
@@ -228,7 +240,7 @@ export const seedContent: ContentRecord[] = [
       ),
       section(
         'Ein fokussierter Start',
-        'Im Mittelpunkt stehen Teamkleidung, ausgewählte Produktionsprojekte und klar abgegrenzte Sourcing-Mandate. Weitere Produktfamilien folgen erst, wenn Zuständigkeit, Lieferweg und Musterbasis geklärt sind.',
+        'Im Mittelpunkt steht der Verkauf fertiger Bekleidung an etablierte europäische Modemarken, Importeure, Großhändler und Distributoren. Ausgewählte Retail- und Online-Programme, Uniformen und Merchandise ergänzen das Angebot. Entwicklung, Veredelung sowie laufende oder projektbezogene Sourcing- und Produktionsleistungen werden separat vereinbart.',
       ),
       section(
         'Was noch aussteht',
@@ -713,12 +725,13 @@ export const seedContent: ContentRecord[] = [
     kind: 'offer',
     slug: 'private-label',
     eyebrow: 'For your brand',
-    title: 'Your product starts with a clear specification.',
+    title: 'Your collection. From first idea to garment supply.',
     description:
-      'A focused route for developing and sourcing garments. Share your category, quantities, technical readiness and target date to start a feasibility discussion.',
+      'Private-label collections and custom garments for brands and the apparel trade. Development and samples prepare the garment order; repeat supply is agreed for each programme.',
     translation: '/de/private-label',
     ctaLabel: 'Describe your project',
-    ctaHref: '/en/contact?category=production',
+    ctaHref: '/en/contact?category=production&service=supply',
+    related: ['garment-supply', 'product-development', 'customers/fashion-brands'],
     sections: [
       section(
         'Separate development from production',
@@ -748,11 +761,16 @@ export const seedContent: ContentRecord[] = [
     eyebrow: 'For your procurement team',
     title: 'A defined brief for your sourcing work.',
     description:
-      'Supplier coordination, development or production follow-up under a separately agreed service mandate. Responsibilities and fees come first.',
+      'An ongoing monthly mandate for a defined supplier portfolio, category or production programme. Agree tasks, reporting and responsibilities before work starts.',
     translation: '/de/sourcing-office',
     ctaLabel: 'Discuss your sourcing needs',
-    ctaHref: '/en/contact?category=sourcing',
+    ctaHref: '/en/contact?category=sourcing&service=office',
+    related: ['production-management', 'quality-support', 'garment-supply'],
     sections: [
+      section(
+        'Ongoing support with a monthly budget',
+        'A monthly fee covers an agreed supplier portfolio, category or production programme. Define tasks, contacts, reporting frequency, duration and additional work before starting. A one-off programme can instead use a project-based production-management mandate.',
+      ),
       section(
         'Who contracts with whom?',
         'Under a service mandate, the buyer contracts with the agreed supplier for the goods. TEXEVO charges a separately agreed fee for its defined services. This is distinct from purchasing finished goods from TEXEVO.',

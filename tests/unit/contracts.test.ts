@@ -3,6 +3,8 @@ import { briefSchema } from '../../src/lib/brief-schema'
 import { cleanFilename, detectFile, validFilename } from '../../src/lib/file-policy'
 import { searchContent } from '../../src/lib/content'
 import { seedContent } from '../../src/content/seed'
+import { audiences, services, businessHref } from '../../src/content/business'
+import { fallbackForm } from '../../src/lib/fallback-form'
 const valid = {
   idempotencyKey: '57419123-d7e1-4f23-96bb-e0cc1a2fd8ad',
   category: 'team',
@@ -15,6 +17,21 @@ const valid = {
 describe('brief boundary', () => {
   it('accepts unknown quantities without inventing a minimum', () => {
     expect(briefSchema.parse({ ...valid, quantity: 'noch offen' }).quantity).toBe('noch offen')
+  })
+  it('retains known customer and service context and rejects arbitrary identifiers', () => {
+    expect(
+      briefSchema.parse({ ...valid, audience: 'wholesale', service: 'quality' }),
+    ).toMatchObject({ audience: 'wholesale', service: 'quality' })
+    expect(briefSchema.safeParse({ ...valid, audience: 'invalid' }).success).toBe(false)
+    expect(briefSchema.safeParse({ ...valid, service: '<script>' }).success).toBe(false)
+    expect(briefSchema.parse(valid)).toMatchObject({ audience: '', service: '' })
+    const retry = fallbackForm(
+      { ...valid, audience: 'retail', service: 'management' },
+      ['Please check'],
+      true,
+    )
+    expect(retry).toContain('value="retail" selected')
+    expect(retry).toContain('value="management" selected')
   })
   it('requires contact and a privacy acknowledgement', () => {
     for (const change of [
@@ -54,6 +71,21 @@ describe('public preview content', () => {
   it('has distinct localized routes and no fabricated approved records', () => {
     expect(new Set(seedContent.map((r) => `${r.locale}/${r.slug}`)).size).toBe(seedContent.length)
     expect(seedContent.every((r) => r.status === 'illustrative')).toBe(true)
+  })
+  it('provides complete translated navigation targets and valid related pages', () => {
+    const paths = new Set([
+      '/de/downloads/groessenliste',
+      ...seedContent.map((r) => `/${r.locale}/${r.slug}`),
+    ])
+    for (const locale of ['de', 'en'] as const) {
+      for (const item of [...audiences, ...services])
+        expect(paths.has(businessHref(item, locale))).toBe(true)
+    }
+    for (const record of seedContent) {
+      if (record.translation) expect(paths.has(record.translation), record.slug).toBe(true)
+      for (const slug of record.related || [])
+        expect(paths.has(`/${record.locale}/${slug}`), record.slug).toBe(true)
+    }
   })
   it('searches German accents and returns useful results and empty states', () => {
     expect(searchContent(seedContent, 'Größen')[0].slug).toContain('groessen')

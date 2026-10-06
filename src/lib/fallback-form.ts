@@ -1,4 +1,5 @@
 import { categoryLabels } from './brief-schema'
+import { audiences, services } from '@/content/business'
 const escape = (value: unknown) =>
   String(value ?? '').replace(
     /[&<>"']/g,
@@ -6,6 +7,15 @@ const escape = (value: unknown) =>
   )
 export function fallbackForm(input: Record<string, unknown>, errors: string[], preview: boolean) {
   const en = input.locale === 'en'
+  const contextFields = [
+    { key: 'audience', label: en ? 'Business type' : 'Unternehmenstyp', options: audiences },
+    { key: 'service', label: en ? 'Service' : 'Leistung', options: services },
+  ]
+    .map(
+      ({ key, label, options }) =>
+        `<label>${label}<select name="${key}"><option value="">${en ? 'To be discussed' : 'Gemeinsam einordnen'}</option>${options.map((option) => `<option value="${option.id}" ${input[key] === option.id ? 'selected' : ''}>${escape(option[en ? 'en' : 'de'].label)}</option>`).join('')}</select></label>`,
+    )
+    .join('')
   const fields = [
     ['company', en ? 'Company' : 'Unternehmen'],
     ['name', en ? 'Contact name' : 'Kontaktperson'],
@@ -27,5 +37,5 @@ export function fallbackForm(input: Record<string, unknown>, errors: string[], p
     )
     .join(
       '',
-    )}</select></label><label>${en ? 'Project description' : 'Ihr Vorhaben'}<textarea name="description" required minlength="10" maxlength="5000">${escape(input.description)}</textarea></label>${fields.map(([key, label]) => `<label>${label}<input type="${key === 'email' ? 'email' : 'text'}" name="${key}" maxlength="254" value="${escape(input[key])}" ${['company', 'name', 'email'].includes(key) ? 'required' : ''}></label>`).join('')}<label><input type="checkbox" name="privacy" required ${input.privacy === true ? 'checked' : ''}> ${en ? 'I have read the privacy notice and request handling of this enquiry.' : 'Ich habe den Datenschutzhinweis gelesen und wünsche die Bearbeitung dieser Anfrage.'}</label><a href="/${en ? 'en/privacy' : 'de/datenschutz'}">${en ? 'Privacy notice' : 'Datenschutzhinweis'}</a><p>${preview ? (en ? 'Preview: test enquiries only. No email is sent.' : 'Vorschau: Nur Testanfragen. Kein E-Mail-Versand.') : ''}</p><button>${en ? 'Send enquiry' : 'Anfrage senden'}</button></form></main></body></html>`
+    )}</select></label>${contextFields}<label>${en ? 'Project description' : 'Ihr Vorhaben'}<textarea name="description" required minlength="10" maxlength="5000">${escape(input.description)}</textarea></label>${fields.map(([key, label]) => `<label>${label}<input type="${key === 'email' ? 'email' : 'text'}" name="${key}" maxlength="254" value="${escape(input[key])}" ${['company', 'name', 'email'].includes(key) ? 'required' : ''}></label>`).join('')}<label><input type="checkbox" name="privacy" required ${input.privacy === true ? 'checked' : ''}> ${en ? 'I have read the privacy notice and request handling of this enquiry.' : 'Ich habe den Datenschutzhinweis gelesen und wünsche die Bearbeitung dieser Anfrage.'}</label><a href="/${en ? 'en/privacy' : 'de/datenschutz'}">${en ? 'Privacy notice' : 'Datenschutzhinweis'}</a><p>${preview ? (en ? 'Preview: test enquiries only. No email is sent.' : 'Vorschau: Nur Testanfragen. Kein E-Mail-Versand.') : ''}</p><button>${en ? 'Send enquiry' : 'Anfrage senden'}</button></form></main></body></html>`
 }

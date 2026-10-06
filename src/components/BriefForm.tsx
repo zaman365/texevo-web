@@ -2,12 +2,15 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { briefSchema, categoryLabels } from '@/lib/brief-schema'
+import { audiences, services } from '@/content/business'
 type Receipt = { id: string; reference: string; uploadToken: string; preview: boolean }
 type Props = {
   locale: 'de' | 'en'
   preview: boolean
   idempotencyKey: string
   category?: string
+  audience?: string
+  service?: string
   product?: string
   short?: boolean
   source?: string
@@ -21,7 +24,9 @@ export function BriefForm(props: Props) {
   const [short, setShort] = useState(!!props.short)
   const [step, setStep] = useState(1)
   const [values, setValues] = useState<Record<string, string>>({
-    category: props.category || 'team',
+    category: props.category || 'production',
+    audience: audiences.some((a) => a.id === props.audience) ? props.audience! : '',
+    service: services.some((s) => s.id === props.service) ? props.service! : '',
     product: props.product || '',
     company: '',
     name: '',
@@ -124,7 +129,7 @@ export function BriefForm(props: Props) {
     })
     const relevant =
       targetStep === 1
-        ? ['category']
+        ? ['category', 'audience', 'service']
         : targetStep === 2
           ? ['description', 'reference']
           : targetStep === 3
@@ -279,27 +284,33 @@ export function BriefForm(props: Props) {
             'Please keep this reference for follow-up.',
           )}
         </p>
-        <Link className="button secondary" href={en ? '/en/private-label' : '/de'}>
+        <Link className="button secondary" href={en ? '/en/services' : '/de'}>
           {t('Zur Startseite', 'Back to overview')}
         </Link>
       </div>
     )
   const show = (n: number) => !enhanced || short || step === n
   const options = [
-    ['team', 'Teamkleidung', 'Team apparel', 'Polos, Shirts, Hoodies', 'Polos, shirts, hoodies'],
     [
       'production',
-      'Eigene Produktion',
-      'Private label',
-      'Ihre Marke, Ihre Spezifikation',
-      'Your brand, your specification',
+      'Bekleidung & Private Label',
+      'Garment supply & private label',
+      'Kollektionen, Großmengen, Nachlieferung',
+      'Collections, bulk orders, repeat supply',
+    ],
+    [
+      'team',
+      'Teamkleidung & Merchandise',
+      'Teamwear & merchandise',
+      'Mitarbeiterkleidung, Vereins- und Markenartikel',
+      'Staff clothing, club and branded apparel',
     ],
     [
       'sourcing',
-      'Sourcing-Begleitung',
-      'Sourcing services',
-      'Ein klar begrenzter Service',
-      'A clearly defined service',
+      'Sourcing & Produktionsbegleitung',
+      'Sourcing & production support',
+      'Laufendes Mandat oder Projekt',
+      'Ongoing mandate or project',
     ],
     [
       'other',
@@ -314,7 +325,7 @@ export function BriefForm(props: Props) {
       values.category,
       categoryLabels[values.category],
       values.category === 'sample'
-        ? 'Samples'
+        ? 'Development & samples'
         : values.category === 'reorder'
           ? 'Reorder'
           : 'Partner enquiry',
@@ -420,10 +431,44 @@ export function BriefForm(props: Props) {
             </label>
           ))}
         </div>
+        <div className="form-grid business-form-context">
+          <label htmlFor="audience">
+            {t('Ihr Unternehmenstyp (optional)', 'Your business type (optional)')}
+            <select
+              id="audience"
+              name="audience"
+              value={values.audience}
+              onChange={(event) => update('audience', event.target.value)}
+            >
+              <option value="">{t('Noch offen / andere', 'Open / another type')}</option>
+              {audiences.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a[props.locale].label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label htmlFor="service">
+            {t('Gewünschte Leistung (optional)', 'Service of interest (optional)')}
+            <select
+              id="service"
+              name="service"
+              value={values.service}
+              onChange={(event) => update('service', event.target.value)}
+            >
+              <option value="">{t('Gemeinsam einordnen', 'Help me decide')}</option>
+              {services.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s[props.locale].label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </div>
       <div className="form-step" hidden={!show(2)}>
         <h2 tabIndex={-1} ref={step === 2 ? heading : undefined}>
-          {t('Wofür sind die Textilien gedacht?', 'Tell us about the intended use.')}
+          {t('Was soll Ihr Projekt erreichen?', 'Tell us what your project needs.')}
         </h2>
         <p>
           {t(
@@ -443,7 +488,7 @@ export function BriefForm(props: Props) {
               minLength={10}
               maxLength={5000}
               placeholder={t(
-                'Zum Beispiel: etwa 100 Polos für unser Serviceteam, Logo auf der Brust. Material und Größen noch offen.',
+                'Zum Beispiel: eine Private-Label-Kollektion, ein Nachlieferprogramm oder Unterstützung bei einem Produktionsprojekt. Mengen und Details dürfen noch offen sein.',
                 'For example: around 100 polos for our service team, chest logo. Material and sizes still open.',
               )}
               aria-invalid={!!errors.description}
@@ -558,6 +603,16 @@ export function BriefForm(props: Props) {
           <dl className="review-list">
             {[
               ['Vorhaben / Project', categoryLabels[values.category] || values.category],
+              [
+                'Unternehmenstyp / Business type',
+                audiences.find((a) => a.id === values.audience)?.[props.locale].label ||
+                  t('Noch offen', 'Open'),
+              ],
+              [
+                'Leistung / Service',
+                services.find((s) => s.id === values.service)?.[props.locale].label ||
+                  t('Gemeinsam einordnen', 'To be discussed'),
+              ],
               ['Beschreibung / Brief', values.description],
               ['Menge / Quantity', values.quantity || t('Noch offen', 'Open')],
               ['Kontakt / Contact', `${values.company} · ${values.name} · ${values.email}`],
