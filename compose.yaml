@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: texevo
+      POSTGRES_DB: texevo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a local POSTGRES_PASSWORD}
+    ports:
+      - '127.0.0.1:55432:5432'
+    volumes:
+      - texevo-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U texevo']
+      interval: 5s
+      retries: 10
+volumes:
+  texevo-db:

@@ -1,0 +1,53 @@
+name: Verify website
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: texevo
+          POSTGRES_PASSWORD: ci-only
+          POSTGRES_DB: texevo
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U texevo" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://texevo:ci-only@127.0.0.1:5432/texevo
+      SITE_MODE: preview
+      SITE_URL: http://localhost:3000
+      PAYLOAD_SECRET: ci-only-not-a-production-secret-0123456789
+      ADMIN_GATE_USER: ci
+      ADMIN_GATE_PASSWORD: ci-only
+      SEED_ADMIN_EMAIL: ci@example.test
+      SEED_ADMIN_PASSWORD: ci-only-password-0123456789
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: touch .env
+      - run: pnpm db:migrate
+      - run: NODE_ENV=production pnpm cms:migrate
+      - run: pnpm seed
+      - run: pnpm typecheck && pnpm test && pnpm test:backend
+      - run: pnpm audit --prod --audit-level=high
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-test-report
+          path: playwright-report/

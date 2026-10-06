@@ -1,0 +1,57 @@
+{
+  "name": "texevo-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.18.3",
+  "engines": {
+    "node": ">=22.17.0 <25"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "setup:local": "node scripts/setup-local.mjs",
+    "db:migrate": "tsx --env-file=.env scripts/migrate.ts",
+    "cms:types": "payload generate:types",
+    "cms:migrate": "payload migrate",
+    "cms:migration:create": "payload migrate:create",
+    "seed": "tsx --env-file=.env scripts/seed.ts",
+    "worker": "tsx --env-file=.env scripts/worker.ts",
+    "check:launch": "tsx --env-file=.env scripts/check-launch.ts",
+    "test:backend": "tsx --env-file=.env scripts/verify-backend.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1146.0",
+    "@fontsource/source-sans-3": "5.3.0",
+    "@fontsource/source-serif-4": "5.3.0",
+    "@payloadcms/db-postgres": "3.90.2",
+    "@payloadcms/next": "3.90.2",
+    "@payloadcms/richtext-lexical": "3.90.2",
+    "graphql": "16.11.0",
+    "next": "16.3.8",
+    "payload": "3.90.2",
+    "pg": "8.16.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "sharp": "0.35.5",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.0",
+    "@playwright/test": "1.63.0",
+    "@types/node": "22.18.8",
+    "@types/pg": "8.15.5",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "prettier": "3.9.9",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  }
+}

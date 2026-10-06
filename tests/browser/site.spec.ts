@@ -1,0 +1,201 @@
+import { test, expect } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+import { randomUUID } from 'node:crypto'
+import { seedContent } from '../../src/content/seed'
+
+test('home, keyboard navigation and responsive layout', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (e) => errors.push(e.message))
+  await page.goto('/de')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Ihr Team.')
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
+  await expect(page.getByRole('link', { name: /Teamkleidung anfragen/ })).toBeVisible()
+  await page.locator('.hero-visual img').evaluate((image: HTMLImageElement) => image.decode())
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 1000 })
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true)
+    if (width === 1440 || width === 390)
+      await page.screenshot({ path: `test-results/home-${width}.png`, fullPage: true })
+  }
+  await page.getByRole('button', { name: 'Menü', exact: true }).click()
+  await expect(page.getByRole('navigation', { name: 'Mobile Navigation' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('button', { name: 'Menü', exact: true })).toBeFocused()
+  expect(errors).toEqual([])
+})
+
+test('all content routes and internal navigation targets resolve', async ({ request }) => {
+  const paths = [
+    '/de',
+    '/de/wissen',
+    '/de/materialien',
+    '/de/journal',
+    '/de/downloads',
+    '/de/anfrage',
+    '/de/nachbestellen',
+    '/de/kontakt',
+    '/de/impressum',
+    '/de/datenschutz',
+    '/de/suche',
+    '/de/newsletter',
+    '/en/contact',
+    '/en/privacy',
+    '/en/legal',
+    ...seedContent.map((r) => `/${r.locale}/${r.slug}`),
+  ]
+  for (const path of paths) expect((await request.get(path)).status(), path).toBe(200)
+  expect((await request.get('/de/not-a-real-page')).status()).toBe(404)
+})
+
+test('search and size worksheet are useful', async ({ page }) => {
+  await page.goto('/de/suche?q=Logo')
+  await expect(page.locator('.result-item').first()).toBeVisible()
+  await page.getByLabel('Suchbegriff').fill('notarealwordxyz')
+  await page.getByRole('button', { name: 'Suchen', exact: true }).click()
+  await expect(page.getByText('Noch keine passende Antwort?')).toBeVisible()
+  await page.goto('/de/downloads/groessenliste')
+  await page.getByLabel('Geplante Gesamtmenge').fill('100')
+  await page.getByLabel('M', { exact: true }).fill('60')
+  await expect(page.getByRole('button', { name: 'Größenliste herunterladen' })).toBeDisabled()
+  await page.getByLabel('L', { exact: true }).fill('40')
+  const download = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Größenliste herunterladen' }).click()
+  expect((await download).suggestedFilename()).toBe('texevo-groessenliste.csv')
+})
+
+test('guided mobile brief preserves inputs on errors and saves a real test receipt', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/de/anfrage')
+  await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  await expect(page.locator('.notice[role=alert]')).toBeVisible()
+  await page
+    .getByLabel('Ihr Vorhaben und offene Fragen')
+    .fill('Wir testen eine Anfrage für 100 Poloshirts mit Logo.')
+  await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  await page.getByLabel('Unternehmen', { exact: true }).fill('TEXEVO Browser Test')
+  await page.getByLabel('Kontaktperson', { exact: true }).fill('Test Person')
+  await page.getByLabel('E-Mail', { exact: true }).fill('browser@example.test')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  await expect(
+    page
+      .locator('.review-list dd')
+      .filter({ hasText: 'Wir testen eine Anfrage für 100 Poloshirts mit Logo.' }),
+  ).toBeVisible()
+  await page.screenshot({ path: 'test-results/brief-390.png', fullPage: true })
+  await page.route('**/api/enquiries', (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: 'application/json',
+      body: JSON.stringify({ error: 'Test: vorübergehend nicht erreichbar.' }),
+    }),
+  )
+  await page.getByRole('button', { name: 'Testanfrage senden', exact: true }).click()
+  await expect(page.locator('.notice[role=alert]')).toContainText('vorübergehend')
+  await expect(
+    page
+      .locator('.review-list dd')
+      .filter({ hasText: 'Wir testen eine Anfrage für 100 Poloshirts mit Logo.' }),
+  ).toBeVisible()
+  await page.unroute('**/api/enquiries')
+  await page.getByRole('button', { name: 'Testanfrage senden', exact: true }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Danke. Ihr Briefing ist angekommen.' }),
+  ).toBeVisible()
+  await expect(page.locator('.receipt-code')).toHaveText(/TX-\d{4}-[A-F0-9]{8}/)
+})
+
+test('idempotency, CSRF, private files and quarantine are enforced', async ({ request }) => {
+  const data = {
+    idempotencyKey: randomUUID(),
+    locale: 'de',
+    category: 'team',
+    company: 'API Test',
+    name: 'Test Person',
+    email: 'api@example.test',
+    description: 'A test request for one hundred polos',
+    privacy: true,
+  }
+  expect((await request.post('/api/enquiries', { data })).status()).toBe(403)
+  const headers = { origin: 'http://localhost:3000' }
+  const [first, duplicate] = await Promise.all([
+    request.post('/api/enquiries', { data, headers }),
+    request.post('/api/enquiries', { data, headers }),
+  ])
+  expect(first.status()).toBe(201)
+  expect(duplicate.status()).toBe(201)
+  const a = await first.json()
+  const b = await duplicate.json()
+  expect(a.reference).toBe(b.reference)
+  expect(
+    (
+      await request.post('/api/enquiries', {
+        data: { ...data, description: 'A different request attempting to reuse the key' },
+        headers,
+      })
+    ).status(),
+  ).toBe(409)
+  const uploadURL = `/api/enquiries/${a.id}/files?slot=0`
+  expect((await request.post(uploadURL, { data: '%PDF-1.7\nTest', headers })).status()).toBe(403)
+  const auth = { ...headers, authorization: `Bearer ${a.uploadToken}`, 'x-file-name': 'logo.svg' }
+  expect((await request.post(uploadURL, { data: '<svg/>', headers: auth })).status()).toBe(415)
+  expect(
+    (
+      await request.post(uploadURL, {
+        data: '%PDF-1.7\nTest fixture',
+        headers: { ...auth, 'x-file-name': 'reference.pdf' },
+      })
+    ).status(),
+  ).toBe(201)
+  expect((await request.get(`/api/staff/files/${a.id}`)).status()).toBe(401)
+  expect((await request.get('/cms-api/content?draft=true')).status()).toBe(401)
+  expect((await request.get('/de/private-label?preview=1')).status()).toBe(401)
+  expect(
+    (
+      await request.post('/api/newsletter', {
+        data: { email: 'test@example.test', consent: true },
+        headers,
+      })
+    ).status(),
+  ).toBe(503)
+})
+
+test('short enquiry works without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false })
+  const page = await context.newPage()
+  await page.goto('http://localhost:3000/de/kontakt')
+  await page
+    .getByLabel('Ihr Vorhaben und offene Fragen')
+    .fill('Test des Formulars ohne JavaScript.')
+  await page.getByLabel('Unternehmen', { exact: true }).fill('No JS Test')
+  await page.getByLabel('Kontaktperson', { exact: true }).fill('Test Person')
+  await page.getByLabel('E-Mail', { exact: true }).fill('nojs@example.test')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Testanfrage senden', exact: true }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ihre Anfrage ist gespeichert.')
+  await context.close()
+})
+
+test('representative pages have no serious accessibility violations', async ({ page }) => {
+  for (const path of [
+    '/de',
+    '/de/anfrage',
+    '/de/wissen/100-poloshirts',
+    '/de/downloads/groessenliste',
+    '/en/contact',
+  ]) {
+    await page.goto(path)
+    const report = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze()
+    expect(
+      report.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
+      path,
+    ).toEqual([])
+  }
+})
