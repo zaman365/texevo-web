@@ -1,6 +1,7 @@
 onlyBuiltDependencies:
   - sharp
   - esbuild
+  - workerd
 overrides:
   undici@7: 7.30.0
   dompurify: 3.4.16

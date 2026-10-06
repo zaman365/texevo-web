@@ -199,7 +199,7 @@ test('idempotency, CSRF, private files and quarantine are enforced', async ({ re
     privacy: true,
   }
   expect((await request.post('/api/enquiries', { data })).status()).toBe(403)
-  const headers = { origin: 'http://localhost:3000' }
+  const headers = { origin: process.env.TEST_BASE_URL || 'http://localhost:3000' }
   const [first, duplicate] = await Promise.all([
     request.post('/api/enquiries', { data, headers }),
     request.post('/api/enquiries', { data, headers }),
@@ -242,12 +242,10 @@ test('idempotency, CSRF, private files and quarantine are enforced', async ({ re
   ).toBe(503)
 })
 
-test('short enquiry works without JavaScript', async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false })
+test('short enquiry works without JavaScript', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL })
   const page = await context.newPage()
-  await page.goto(
-    'http://localhost:3000/de/kontakt?category=sourcing&audience=wholesale&service=office',
-  )
+  await page.goto('/de/kontakt?category=sourcing&audience=wholesale&service=office')
   await expect(page.getByLabel('Ihr Unternehmenstyp (optional)')).toHaveValue('wholesale')
   await expect(page.getByLabel('Gewünschte Leistung (optional)')).toHaveValue('office')
   await page

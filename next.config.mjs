@@ -17,6 +17,7 @@ const securityHeaders = [
 export default withPayload({
   poweredByHeader: false,
   output: 'standalone',
+  serverExternalPackages: ['pg-cloudflare'],
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }]
   },

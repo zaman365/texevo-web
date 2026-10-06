@@ -1,9 +1,10 @@
 import pg from 'pg'
+import { databasePoolOptions } from './cloudflare'
 const globalDB = globalThis as unknown as { texevoPool?: pg.Pool }
 export const db =
   globalDB.texevoPool ||
   new pg.Pool({
-    connectionString: process.env.DATABASE_URL,
+    ...databasePoolOptions(),
     max: 6,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 10000,

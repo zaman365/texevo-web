@@ -49,7 +49,7 @@ Backend verification creates and cleans up isolated test users/content, then sim
 
 ## Deployment preparation
 
-This repository is ready to build as a Node application; it is **not approved for public commercial launch**. See [launch checklist](docs/launch-checklist.md), [operations runbook](docs/operations.md), [integration contracts](docs/integrations.md), [content guide](docs/content-guide.md) and [implementation scope](docs/implementation-scope.md).
+This repository supports Node hosting and Cloudflare Workers through OpenNext; it is **not approved for public commercial launch**. See [Cloudflare deployment](docs/cloudflare-deployment.md), [launch checklist](docs/launch-checklist.md), [operations runbook](docs/operations.md), [integration contracts](docs/integrations.md), [content guide](docs/content-guide.md) and [implementation scope](docs/implementation-scope.md).
 
 `pnpm check:launch` deliberately fails with the pending items in this preview. It is a configuration check, not certification of legal compliance, accessibility, supplier capability or operational readiness. Do not change `SITE_MODE` until content, identity, processors, MFA, infrastructure and recovery have been approved. Keep preview/staging behind access control and noindex; noindex is not authentication.
 

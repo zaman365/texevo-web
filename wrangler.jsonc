@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "texevo-web",
+  "account_id": "48dd3aa43c937cea4bbb1840184461cc",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-06",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "texevo-web" }],
+  "vars": {
+    "SITE_MODE": "preview",
+    "SITE_URL": "https://texevo.de",
+    "DEPLOY_TARGET": "cloudflare",
+    "NEWSLETTER_ENABLED": "false",
+    "TRUST_PROXY": "true",
+  },
+  "observability": { "enabled": true },
+}

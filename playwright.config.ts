@@ -10,10 +10,12 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   reporter: [['list'], ['html', { open: 'never' }]],
-  webServer: {
-    command: 'pnpm start',
-    url: 'http://localhost:3000/api/health',
-    reuseExistingServer: !process.env.CI,
-    timeout: 60000,
-  },
+  webServer: process.env.TEST_BASE_URL
+    ? undefined
+    : {
+        command: 'pnpm start',
+        url: 'http://localhost:3000/api/health',
+        reuseExistingServer: !process.env.CI,
+        timeout: 60000,
+      },
 })

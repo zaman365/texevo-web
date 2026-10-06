@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { adminOnly, adminField, editorial, hasRole, readContent } from './cms/access'
 import { updateSearchProjection, deleteSearchProjection } from './cms/search-projection'
+import { databasePoolOptions } from './lib/cloudflare'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const Users: CollectionConfig = {
@@ -215,7 +216,7 @@ export default buildConfig({
     },
   }),
   db: postgresAdapter({
-    pool: { connectionString: process.env.DATABASE_URL },
+    pool: databasePoolOptions(),
     push: process.env.NODE_ENV !== 'production',
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
